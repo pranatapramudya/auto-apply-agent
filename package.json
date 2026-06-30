@@ -4,17 +4,28 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "bot": "tsx src/bot/userbot.ts"
   },
   "dependencies": {
-    "next": "16.2.9"
+    "@neondatabase/serverless": "^1.1.0",
+    "@prisma/adapter-neon": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "input": "^1.0.1",
+    "next": "16.2.9",
+    "telegram": "^2.26.22",
+    "twitter-api-v2": "^1.29.0",
+    "ws": "^8.21.0"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^19",
+    "@types/ws": "^8.18.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
+    "prisma": "^7.8.0",
+    "tsx": "^4.22.4",
     "typescript": "^5"
   }
 }
