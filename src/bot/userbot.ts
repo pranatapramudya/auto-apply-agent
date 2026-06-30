@@ -3,6 +3,7 @@ import { StringSession } from "telegram/sessions";
 import { NewMessage, NewMessageEvent } from "telegram/events";
 import input from "input";
 import * as dotenv from "dotenv";
+import http from "http";
 import { evaluateAndAct } from "../services/agent";
 
 // Memuat variabel .env
@@ -78,3 +79,12 @@ async function startUserbot() {
 }
 
 startUserbot();
+
+// HTTP Server dummy untuk health check Uptime Robot (mencegah spin down di hosting gratis)
+const PORT = process.env.PORT || 3000;
+http.createServer((req, res) => {
+  res.writeHead(200);
+  res.end('Bot is alive!');
+}).listen(PORT, () => {
+  console.log(`Dummy HTTP server listening on port ${PORT}`);
+});

@@ -1,22 +1,24 @@
 # Product Requirement Document (PRD) - One-Sales-Man
-## Version: 4.0 (Pre-Deployment & Code Audit)
+## Version: 4.1 (Build Fix & Free Hosting Prep)
 
 ### 1. Tujuan
-Melakukan audit menyeluruh pada *codebase* sebelum proyek di-push ke GitHub dan di-deploy. Fokus utama adalah keamanan kredensial, kebersihan kode, optimasi build Next.js + Prisma, dan standarisasi dokumentasi.
+Memperbaiki error kompilasi TypeScript pada Vercel terkait `AgentContext` dan mempersiapkan codebase agar Stealth Userbot dapat di-hosting secara gratis menggunakan strategi Web Service (Render/Koyeb) + Uptime Robot.
 
-### 2. Area Audit & Standarisasi
-1. **Keamanan Kredensial (Environment Variables):**
-   - Pastikan file `.env` sudah masuk ke dalam `.gitignore`.
-   - Buat file `.env.example` yang berisi daftar variabel tanpa *value* asli agar aman di-push ke GitHub.
-2. **Kesiapan Build (Vercel & Next.js):**
-   - Periksa `package.json`. Pastikan script `build` menjalankan `prisma generate` sebelum proses `next build` agar tidak terjadi *crash* saat deployment di Vercel.
-   - Hapus *unused imports* dan *console.log* yang tidak krusial untuk *production*.
-3. **Standarisasi Bahasa:**
-   - Seluruh komentar teknis dalam kode, instruksi UI (jika ada dasbor Next.js), dan dokumentasi HARUS menggunakan Bahasa Indonesia untuk mempermudah pemahaman personal dan relevansi lokal.
-4. **Pemisahan Arsitektur:**
-   - Berikan catatan atau peringatan di `README.md` (jika dibuat) bahwa `src/bot/userbot.ts` adalah *long-running process* yang harus dijalankan terpisah dari arsitektur *serverless* Vercel.
+### 2. Identifikasi Masalah
+- Vercel gagal melakukan build karena tipe `tweetId` tidak ditemukan pada `AgentContext` di file `src/services/agent.ts`.
+- Layanan hosting gratis (Web Service) mewajibkan aplikasi untuk me-listen pada suatu PORT HTTP. Jika tidak, proses deployment akan dianggap gagal (timeout).
 
-### 3. Hasil Akhir yang Diharapkan
-- File `.env.example` tersedia.
-- `.gitignore` terkonfigurasi dengan benar (mengabaikan `.env`, `node_modules`, `.next`).
-- Kode bersih dari sisa-sisa eksperimen sebelumnya dan siap di-push ke *repository* utama.
+### 3. Tugas Eksekusi Kritis
+1. **Fix Type Error (`agent.ts`):** 
+   - Buka `src/services/agent.ts`.
+   - Tambahkan properti opsional `tweetId?: string;` ke dalam tipe data `AgentContext`.
+2. **Setup Dummy HTTP Server (`userbot.ts`):**
+   - Buka `src/bot/userbot.ts`.
+   - Import modul `http` bawaan Node.js.
+   - Buat server HTTP sederhana yang melakukan `listen` pada `process.env.PORT || 3000`.
+   - Jika ada request masuk (misal `/ping`), kembalikan status 200 dengan pesan "Bot is alive!".
+   - Jalankan server HTTP ini di bagian paling bawah atau bersamaan dengan inisialisasi `startUserbot()`.
+
+### 4. Hasil Akhir yang Diharapkan
+- Build Next.js di Vercel sukses tanpa Type Error.
+- `userbot.ts` memiliki endpoint HTTP (Health Check) yang bisa diping oleh Uptime Robot setiap 5 menit agar hosting gratisan tidak tertidur (spin down).

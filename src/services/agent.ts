@@ -93,6 +93,7 @@ async function evaluateWithLLM(text: string): Promise<LLMResponse> {
 export type AgentContext = {
   username?: string;
   chatId?: string;
+  tweetId?: string;
   // field tambahan lain jika diperlukan di masa depan
 };
 
