@@ -1,24 +1,22 @@
 # Product Requirement Document (PRD) - One-Sales-Man
-## Version: 4.1 (Build Fix & Free Hosting Prep)
+## Version: 4.4 (Vercel Build Fix & X/Twitter Legacy Cleanup)
 
 ### 1. Tujuan
-Memperbaiki error kompilasi TypeScript pada Vercel terkait `AgentContext` dan mempersiapkan codebase agar Stealth Userbot dapat di-hosting secara gratis menggunakan strategi Web Service (Render/Koyeb) + Uptime Robot.
+Menyelesaikan error kompilasi Next.js di Vercel (`Argument of type '"X"' is not assignable to parameter of type '"TELEGRAM"'`) dengan cara menghapus sisa rute API lama yang tidak lagi relevan dengan fokus sistem saat ini (Telegram Userbot).
 
 ### 2. Identifikasi Masalah
-- Vercel gagal melakukan build karena tipe `tweetId` tidak ditemukan pada `AgentContext` di file `src/services/agent.ts`.
-- Layanan hosting gratis (Web Service) mewajibkan aplikasi untuk me-listen pada suatu PORT HTTP. Jika tidak, proses deployment akan dianggap gagal (timeout).
+- File `src/app/api/sniper/route.ts` (dan kemungkinan rute simulasi/cron lainnya) masih menggunakan pemanggilan fungsi `evaluateAndAct` dengan argumen platform `'X'`.
+- Definisi fungsi `evaluateAndAct` di `src/services/agent.ts` saat ini hanya menerima union type `'TELEGRAM'`.
+- Karena operasional Twitter/X belum akan diluncurkan di fase ini, kode tersebut menjadi *dead code* yang memblokir proses deployment Vercel.
 
 ### 3. Tugas Eksekusi Kritis
-1. **Fix Type Error (`agent.ts`):** 
-   - Buka `src/services/agent.ts`.
-   - Tambahkan properti opsional `tweetId?: string;` ke dalam tipe data `AgentContext`.
-2. **Setup Dummy HTTP Server (`userbot.ts`):**
-   - Buka `src/bot/userbot.ts`.
-   - Import modul `http` bawaan Node.js.
-   - Buat server HTTP sederhana yang melakukan `listen` pada `process.env.PORT || 3000`.
-   - Jika ada request masuk (misal `/ping`), kembalikan status 200 dengan pesan "Bot is alive!".
-   - Jalankan server HTTP ini di bagian paling bawah atau bersamaan dengan inisialisasi `startUserbot()`.
+1. **Hapus Folder Legacy API:**
+   - Hapus folder `src/app/api/sniper` beserta seluruh isinya secara permanen.
+   - Hapus folder `src/app/api/cron` (jika ada dan hanya berisi sisa cron job Twitter/X).
+   - Hapus folder `src/app/api/simulate` (jika ada dan tidak relevan dengan arsitektur saat ini).
+2. **Validasi Build Lokal:**
+   - Pastikan tidak ada lagi file di dalam proyek yang memanggil `evaluateAndAct` dengan argumen `'X'`.
 
 ### 4. Hasil Akhir yang Diharapkan
-- Build Next.js di Vercel sukses tanpa Type Error.
-- `userbot.ts` memiliki endpoint HTTP (Health Check) yang bisa diping oleh Uptime Robot setiap 5 menit agar hosting gratisan tidak tertidur (spin down).
+- Vercel berhasil melakukan proses `npm run build` tanpa terhalang strict type error TypeScript.
+- Codebase Next.js menjadi lebih ringan dan difokuskan murni sebagai fondasi UI dan manajemen Database Prisma.
