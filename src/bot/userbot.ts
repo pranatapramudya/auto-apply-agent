@@ -1,9 +1,9 @@
 import { TelegramClient } from "telegram";
 import { StringSession } from "telegram/sessions";
 import { NewMessage, NewMessageEvent } from "telegram/events";
-import input from "input";
+import readline from "readline/promises";
 import * as dotenv from "dotenv";
-import http from "http";
+import * as http from "http";
 import { evaluateAndAct } from "../services/agent";
 
 // Memuat variabel .env
@@ -23,15 +23,19 @@ const client = new TelegramClient(sessionString, apiId, apiHash, {
 });
 
 async function startUserbot() {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+
   await client.start({
-    phoneNumber: async () => await input.text("Please enter your number: "),
-    password: async () => await input.text("Please enter your password: "),
-    phoneCode: async () => await input.text("Please enter the code you received: "),
+    phoneNumber: async () => await rl.question("Please enter your number: "),
+    password: async () => await rl.question("Please enter your password: "),
+    phoneCode: async () => await rl.question("Please enter the code you received: "),
     onError: (err) => console.log(err),
   });
 
+  rl.close();
+
   console.log("You should now be connected.");
-  const savedSession = client.session.save();
+  const savedSession = client.session.save() as unknown as string;
   if (savedSession) {
     console.log("\n=== SAVE THIS SESSION STRING TO YOUR .env AS TELEGRAM_SESSION ===");
     console.log(savedSession);
@@ -81,7 +85,7 @@ async function startUserbot() {
 startUserbot();
 
 // HTTP Server dummy untuk health check Uptime Robot (mencegah spin down di hosting gratis)
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 http.createServer((req, res) => {
   res.writeHead(200);
   res.end('Bot is alive!');
