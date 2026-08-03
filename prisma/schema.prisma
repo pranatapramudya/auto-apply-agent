@@ -6,20 +6,32 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Lead {
-  id              String    @id @default(uuid())
-  platform        String    // "TWITTER" atau "TELEGRAM"
-  externalId      String    @unique // Twitter User ID / Chat ID
-  status          String    @default("POTENTIAL") // POTENTIAL, CONTACTED, IGNORED
-  lastContactedAt DateTime?
-  interactions    Interaction[]
+enum LeadStatus {
+  PENDING
+  CONTACTED
+  HOT_LEAD
+  CLOSED
 }
 
-model Interaction {
+model Prospect {
+  id              String     @id @default(uuid())
+  businessName    String
+  category        String?
+  city            String?
+  whatsappNumber  String     @unique
+  rating          Float?
+  status          LeadStatus @default(PENDING)
+  scrapedAt       DateTime   @default(now())
+  lastContactedAt DateTime?
+  notes           String?    @db.Text
+
+  messages        OutreachMessage[]
+}
+
+model OutreachMessage {
   id          String   @id @default(uuid())
-  leadId      String
-  lead        Lead     @relation(fields: [leadId], references: [id])
-  contextText String   @db.Text // Pesan pemicu
-  aiResponse  String   @db.Text // Jawaban AI
-  createdAt   DateTime @default(now())
+  prospectId  String
+  prospect    Prospect @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  messageText String   @db.Text
+  sentAt      DateTime @default(now())
 }

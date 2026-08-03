@@ -140,7 +140,6 @@ export async function evaluateAndAct(
 
     // 3. DATABASE LOGGING (PRISMA)
     // Mencatat Lead dan Interaksi sesuai schema.prisma
-    /*
     const lead = await prisma.lead.upsert({
       where: {
         externalId: externalId
@@ -164,9 +163,8 @@ export async function evaluateAndAct(
         aiResponse: evaluation.response
       }
     });
-    */
 
-    console.log(`[AGENT-SUCCESS] Eksekusi di ${platform} berhasil (Database Bypassed).`);
+    console.log(`[AGENT-SUCCESS] Eksekusi di ${platform} berhasil (Data disimpan ke DB).`);
     return evaluation.response;
 
   } catch (error) {

@@ -1,40 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/create-next-app).
+# One Salesman Bot 🤖💼
 
-## Getting Started
+**One Salesman** adalah sebuah sistem Bot B2B Outreach Otomatis (Auto-Pilot) yang dirancang untuk mempermudah akuisisi klien UMKM lokal. Sistem ini mengombinasikan tiga fitur utama: **Scraper Google Maps**, **WhatsApp Blaster**, dan **AI Negotiator (berbasis Groq)** untuk mencari, mengontak, dan melakukan negosiasi awal dengan calon klien secara mandiri.
 
-First, run the development server:
+---
+
+## 📋 Prerequisites
+
+Pastikan sistem Anda telah memenuhi persyaratan berikut sebelum menjalankan proyek ini:
+- **Node.js** v24 atau yang lebih baru.
+- **PostgreSQL** (Direkomendasikan menggunakan [Neon Serverless Postgres](https://neon.tech/)).
+- Browser **Google Chrome** / **Chromium** (untuk Playwright dan Puppeteer).
+
+---
+
+## 🛠 Instalasi
+
+Kloning repositori ini, lalu install semua dependensi menggunakan `npm`:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/route.ts`. The page auto-updates as you edit the file.
+## ⚙️ Setup Environment
 
-## Learn More
+1. Salin file template environment bawaan:
+   ```bash
+   cp .env.example .env
+   ```
+2. Buka file `.env` dan lengkapi variabel berikut:
+   - `DATABASE_URL`: Connection string utama untuk Prisma Adapter (Neon).
+   - `DIRECT_URL`: Connection string untuk perintah CLI Prisma (seperti `db push` atau `migrate`).
+   - `GROQ_API_KEY` / `LLM_API_KEY`: Kunci API untuk mengaktifkan AI Negotiator dari Groq.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🚀 Cara Menjalankan Utama
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Sistem ini didesain agar mudah dijalankan dalam satu perintah utama. Konfigurasi `dotenv` sudah disuntikkan secara otomatis di dalam kode.
 
-## Deploy on Vercel
+Jalankan perintah berikut di terminal Anda:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npx tsx src/pipeline/runner.ts
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+> **Catatan:** Pada saat pertama kali dijalankan, sistem akan meminta Anda untuk memindai **QR Code** WhatsApp melalui terminal.
 
-## API Routes
+---
 
-This directory contains example API routes for the headless API app.
+## 🔄 Alur Kerja (Workflow)
 
-For more details, see [route.js file convention](https://nextjs.org/docs/app/api-reference/file-conventions/route).
+Berikut adalah bagaimana robot "One Salesman" bekerja dari awal hingga akhir:
+
+1. **Scraping Target (Google Maps):** 
+   Playwright akan membuka browser, mencari target spesifik (misal: "Klinik di Sumedang"), dan mengekstrak nama bisnis beserta nomor telepon.
+2. **Penyimpanan Data:** 
+   Data yang tersanitasi akan masuk ke dalam database via Prisma dengan status awal `PENDING`.
+3. **Outreach & Blaster:** 
+   Bot WhatsApp akan mengirimkan pesan sapaan awal yang sopan (Anti-Gatekeeper) kepada prospek `PENDING` dengan waktu tunda (delay) acak agar tidak terkena ban. Status prospek lalu berubah menjadi `CONTACTED`.
+4. **AI Negotiator Beraksi:** 
+   Jika prospek merespons, **Groq AI (Llama 3)** akan bertindak sebagai Sales Representative untuk menjawab pertanyaan, mengedukasi klien, dan menawarkan solusi (termasuk tawaran sistem sewa berlangganan jika klien keberatan dengan harga custom).
+5. **Human Handoff:** 
+   Ketika AI mendeteksi intensi ketertarikan kuat dari klien (misal minta meeting, harga detail, atau setuju), AI akan menyerahkan percakapan kepada tenaga manusia (Technical Lead) dan mengubah status prospek menjadi `HOT_LEAD`.
