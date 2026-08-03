@@ -140,27 +140,26 @@ export async function evaluateAndAct(
 
     // 3. DATABASE LOGGING (PRISMA)
     // Mencatat Lead dan Interaksi sesuai schema.prisma
-    const lead = await prisma.lead.upsert({
+    const prospect = await prisma.prospect.upsert({
       where: {
-        externalId: externalId
+        whatsappNumber: externalId
       },
       update: {
         status: 'CONTACTED',
         lastContactedAt: new Date()
       },
       create: {
-        platform: platform,
-        externalId: externalId,
+        whatsappNumber: externalId,
+        businessName: "Unknown Lead", // Required by Prospect schema
         status: 'CONTACTED',
         lastContactedAt: new Date()
       }
     });
 
-    await prisma.interaction.create({
+    await prisma.outreachMessage.create({
       data: {
-        leadId: lead.id,
-        contextText: text,
-        aiResponse: evaluation.response
+        prospectId: prospect.id,
+        messageText: evaluation.response
       }
     });
 
