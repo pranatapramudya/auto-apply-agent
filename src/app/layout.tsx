@@ -2,8 +2,8 @@ import "./globals.css";
 import React from 'react';
 
 export const metadata = {
-  title: "One Salesman Dashboard",
-  description: "Minimalist B2B Outreach Dashboard",
+  title: "Auto-Apply Agent | Multi-User Job Hunter Dashboard",
+  description: "Autonomous Job Auto-Apply Agent Dashboard with Human-in-the-Loop Approval",
 };
 
 export default function RootLayout({
@@ -12,8 +12,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="bg-gray-50 text-gray-900 min-h-screen">
+    <html lang="id">
+      <body className="bg-slate-50 text-slate-900 min-h-screen antialiased selection:bg-slate-200">
         {children}
       </body>
     </html>

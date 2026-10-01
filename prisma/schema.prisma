@@ -6,32 +6,56 @@ generator client {
   provider = "prisma-client-js"
 }
 
-enum LeadStatus {
-  PENDING
-  CONTACTED
-  HOT_LEAD
-  CLOSED
-}
-
-model Prospect {
-  id              String     @id @default(uuid())
-  businessName    String
-  category        String?
+model User {
+  id              String       @id @default(uuid())
+  fullName        String
+  email           String       @unique
+  phone           String?
   city            String?
-  whatsappNumber  String     @unique
-  rating          Float?
-  status          LeadStatus @default(PENDING)
-  scrapedAt       DateTime   @default(now())
-  lastContactedAt DateTime?
-  notes           String?    @db.Text
-
-  messages        OutreachMessage[]
+  linkedInUrl     String?
+  githubUrl       String?
+  portfolioUrl    String?
+  resumeLocalPath String
+  targetRoles     String
+  coreSkills      String
+  expectedSalary  Int?
+  isActive        Boolean      @default(true)
+  listings        JobListing[]
+  createdAt       DateTime     @default(now())
 }
 
-model OutreachMessage {
-  id          String   @id @default(uuid())
-  prospectId  String
-  prospect    Prospect @relation(fields: [prospectId], references: [id], onDelete: Cascade)
-  messageText String   @db.Text
-  sentAt      DateTime @default(now())
+model JobListing {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  platform      String    // e.g. "TECH_IN_ASIA", "LINKEDIN", "GREENHOUSE", "LEVER"
+  externalId    String?
+  title         String
+  companyName   String
+  jobUrl        String
+  location      String?
+  salaryRange   String?
+  description   String    @db.Text
+  isLegit       Boolean   @default(true)
+  scamReason    String?
+  matchScore    Float?
+  status        JobStatus @default(DISCOVERED)
+  failureReason String?
+  appliedAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([userId, jobUrl])
+}
+
+enum JobStatus {
+  DISCOVERED
+  FILTERED_OUT
+  QUEUED_FOR_APPLY
+  APPLYING
+  APPLIED
+  UNDER_REVIEW
+  INTERVIEW
+  REJECTED
+  FAILED
 }

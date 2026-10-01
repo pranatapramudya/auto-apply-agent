@@ -4,16 +4,28 @@ import { PrismaNeon } from '@prisma/adapter-neon';
 import { PrismaClient } from '@prisma/client';
 import ws from 'ws';
 
-// Wajib untuk environment Node.js
-neonConfig.webSocketConstructor = ws; 
+// Gunakan native WebSocket bawaan runtime Node.js (22+) jika tersedia
+// untuk menghindari bug bundling Next.js "TypeError: bufferUtil.mask is not a function"
+if (typeof WebSocket !== 'undefined') {
+  neonConfig.webSocketConstructor = WebSocket;
+} else {
+  neonConfig.webSocketConstructor = ws;
+}
 
 const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
-  throw new Error("DATABASE_URL tidak ditemukan! Pastikan .env sudah diload.");
+  throw new Error('DATABASE_URL tidak ditemukan! Pastikan .env sudah diload.');
 }
 
 const adapter = new PrismaNeon({ connectionString });
-const prisma = new PrismaClient({ adapter });
+
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
+
+export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
 export default prisma;

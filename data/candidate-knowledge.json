@@ -1,0 +1,164 @@
+{
+  "candidates": {
+    "primary": {
+      "id": "primary",
+      "fullName": "Pranata Pramudya",
+      "email": "pranataprp@gmail.com",
+      "phone": "+62 812-3456-7890",
+      "city": "Sumedang / Bandung, Indonesia",
+      "linkedInUrl": "https://linkedin.com/in/pranataprp",
+      "githubUrl": "https://github.com/pranataprp",
+      "portfolioUrl": "https://pranata.dev",
+      "targetRoles": [
+        "Full-stack Developer",
+        "Next.js Developer",
+        "Backend Engineer",
+        "AI Solutions Engineer"
+      ],
+      "coreSkills": [
+        "TypeScript",
+        "Next.js",
+        "React",
+        "Node.js",
+        "PostgreSQL",
+        "Prisma ORM",
+        "Python",
+        "Playwright",
+        "TailwindCSS",
+        "RESTful APIs",
+        "Docker",
+        "Git"
+      ],
+      "professionalSummary": "Full-stack & AI Solutions Engineer berpengalaman dalam membangun arsitektur web performa tinggi menggunakan Next.js, TypeScript, PostgreSQL, dan Playwright. Ahli dalam merancang pipeline automasi cerdas, optimasi database berskala besar, serta integrasi Large Language Models (LLM) dengan pendekatan zero-hallucination.",
+      "workExperience": [
+        {
+          "position": "Lead Full-stack Engineer",
+          "company": "Digital Inovasi Solusindo",
+          "period": "2023 - Sekarang",
+          "location": "Bandung / Remote",
+          "bulletPoints": [
+            "Merancang dan memelihara microservices berbasis Node.js dan Next.js dengan arsitektur serverless, meningkatkan throughput API hingga 45%.",
+            "Mengimplementasikan pipeline automasi browser cerdas dengan Playwright dan AI LLM, menghemat lebih dari 120 jam operasional manual per bulan.",
+            "Memimpin optimasi query PostgreSQL dan Prisma ORM, memangkas latensi respon database rata-rata dari 420ms menjadi 85ms.",
+            "Membangun dashboard analitik SaaS modern berbasis React 19, TailwindCSS, dan server-sent events dengan uptime 99.9%."
+          ]
+        },
+        {
+          "position": "Software Engineer (Full-stack)",
+          "company": "Kreatif Solusi Mandiri",
+          "period": "2021 - 2023",
+          "location": "Jakarta / Hybrid",
+          "bulletPoints": [
+            "Mengembangkan aplikasi web e-commerce dan dashboard internal berbasis Next.js, TypeScript, dan TailwindCSS melayani >50.000 pengguna aktif bulanan.",
+            "Merancang skema database relational terdistribusi dengan PostgreSQL dan caching Redis, mengurangi beban server puncak hingga 30%.",
+            "Mengotomatiskan pipeline CI/CD menggunakan GitHub Actions dan Docker, mempersingkat siklus deployment dari 40 menit menjadi 8 menit.",
+            "Berkolaborasi erat dengan tim produk dan UI/UX untuk menghasilkan antarmuka responsif dan aksesibel sesuai standar WCAG AA."
+          ]
+        }
+      ],
+      "projects": [
+        {
+          "name": "Autonomous Auto-Apply Agent",
+          "technologies": "Next.js 16, TypeScript, Playwright, Groq LLM, Prisma, PostgreSQL",
+          "description": "Sistem digital talent acquisition otonom berbasis AI dengan anti-bot stealth evasion, dynamic JIT ATS-tailored resume generation, dan recruiter direct email outreach."
+        },
+        {
+          "name": "High-Throughput Lead Enrichment Engine",
+          "technologies": "Node.js, TypeScript, Playwright, Better-SQLite3, Worker Threads",
+          "description": "Mesin crawling dan enrichment data B2B real-time dengan deduplikasi otomatis dan scoring kecocokan prospek berbasis LLM."
+        }
+      ],
+      "education": [
+        {
+          "degree": "Sarjana Komputer (S.Kom) - Teknik Informatika",
+          "institution": "Universitas Komputer Indonesia",
+          "year": "2017 - 2021"
+        }
+      ],
+      "certifications": [
+        "Meta Front-End Developer Professional Certificate",
+        "AWS Certified Solutions Architect - Associate (Preparation)"
+      ]
+    },
+    "partner": {
+      "id": "partner",
+      "fullName": "Siti Fathonah",
+      "email": "siti.fathonah@example.com",
+      "phone": "+62 898-7654-3210",
+      "city": "Sumedang / Bandung / Jakarta, Indonesia",
+      "linkedInUrl": "https://linkedin.com/in/sitifathonah",
+      "githubUrl": "https://github.com/sitifathonah",
+      "portfolioUrl": "https://sitifathonah.dev",
+      "targetRoles": [
+        "Staff Administrasi Publik",
+        "Document Controller",
+        "General Affairs (GA)",
+        "Tata Kelola Dokumen & Kearsipan",
+        "Government Relations Officer",
+        "Staff Administrasi Perkantoran & Sekretariat",
+        "Staff Operasional Semua Jurusan"
+      ],
+      "coreSkills": [
+        "Administrasi Perkantoran",
+        "Manajemen Kearsipan Digital",
+        "Tata Naskah Dinas & Korespondensi",
+        "Microsoft Excel (Pivot Table, VLOOKUP, Data Validation)",
+        "Microsoft Word & Google Workspace",
+        "Standard Operating Procedure (SOP)",
+        "Pelayanan Prima (Service Excellence)",
+        "Public Relations & Hubungan Antar Lembaga",
+        "Manajemen Inventaris & Logistik Kantor",
+        "Administrasi Kepegawaian (HR Admin)"
+      ],
+      "professionalSummary": "Sarjana Administrasi Publik (S.AP) yang teliti, adaptif, dan berdedikasi tinggi dengan keahlian mendalam dalam tata kelola dokumen kedinasan, sistem kearsipan digital, penyusunan SOP birokrasi, serta administrasi operasional perkantoran. Berpengalaman dalam memproses lebih dari 1.200 berkas resmi per bulan dengan akurasi 99.8% dan efisiensi penataan arsip modern.",
+      "workExperience": [
+        {
+          "position": "Senior Administration & Document Controller",
+          "company": "PT Graha Mitra Administrasi",
+          "period": "2022 - Sekarang",
+          "location": "Bandung / Jakarta",
+          "bulletPoints": [
+            "Mengelola alur keluar-masuk lebih dari 1.200 surat naskah dinas dan dokumen legal per bulan dengan sistem pengarsipan digital terintegrasi, mempercepat waktu temu kembali arsip hingga 50%.",
+            "Menyusun dan memperbarui 15+ Standard Operating Procedure (SOP) divisi administrasi dan general affairs untuk memastikan kepatuhan standar ISO dan efisiensi alur birokrasi internal.",
+            "Bertanggung jawab atas korespondensi resmi, notulensi rapat eksekutif koordinasi stakeholder, serta pembuatan laporan rekapitulasi operasional rutin.",
+            "Menggunakan Microsoft Excel tingkat lanjut (Pivot Table, VLOOKUP, Sumif) untuk pencatatan dan audit inventaris aset perkantoran senilai ratusan juta rupiah tanpa selisih."
+          ]
+        },
+        {
+          "position": "Staf Administrasi Umum & Pelayanan Publik",
+          "company": "Biro Layanan Terpadu & Kesekretariatan",
+          "period": "2020 - 2022",
+          "location": "Jawa Barat",
+          "bulletPoints": [
+            "Memberikan pelayanan administrasi terpadu kepada lebih dari 80 pemohon per hari dengan indeks kepuasan pelayanan mencapai 96%.",
+            "Mengklasifikasikan, meregister, dan mendistribusikan surat masuk/keluar ke unit kerja terkait sesuai prioritas dan tenggat waktu naskah dinas.",
+            "Mengorganisir agenda perjalanan dinas, akomodasi, dan persiapan dokumen kelengkapan administrasi kegiatan pimpinan secara rapi dan tepat waktu."
+          ]
+        }
+      ],
+      "projects": [
+        {
+          "name": "Digitalisasi & Modernisasi Tata Kelola Kearsipan",
+          "technologies": "Sistem Informasi Kearsipan, Google Drive for Enterprise, Microsoft Excel Database",
+          "description": "Transformasi pengarsipan berkas konvensional ke repositori digital berbasis cloud dengan skema penomoran terindeks otomatis."
+        },
+        {
+          "name": "Optimalisasi Alur SOP Pelayanan Administrasi Publik",
+          "technologies": "BPMN Flowcharting, SOP Development, Form Standardization",
+          "description": "Perancangan ulang alur pengajuan dokumen internal yang berhasil memangkas waktu birokrasi dari 4 hari kerja menjadi 1 hari kerja."
+        }
+      ],
+      "education": [
+        {
+          "degree": "Sarjana Administrasi Publik (S.AP)",
+          "institution": "Universitas Padjadjaran / Universitas Terkemuka",
+          "year": "2016 - 2020"
+        }
+      ],
+      "certifications": [
+        "Sertifikasi Pengelolaan Kearsipan & Tata Naskah Dinas",
+        "Sertifikasi Microsoft Office Specialist (Excel & Word)"
+      ]
+    }
+  }
+}
