@@ -1,28 +1,34 @@
-import Groq from 'groq-sdk';
-import { RawSocialPost, ExtractedSocialJob } from './types';
+import { config } from "../../config/env";
+import Groq from "groq-sdk";
+import { RawSocialPost, ExtractedSocialJob } from "./types";
 
 const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY || ''
+  apiKey: config.ai.groqKey || "",
 });
 
 // Model aktif di akun Groq user
 const ACTIVE_MODELS = [
-  'openai/gpt-oss-120b',
-  'openai/gpt-oss-20b',
-  'qwen/qwen3.8-27b',
-  'groq/compound'
+  "openai/gpt-oss-120b",
+  "openai/gpt-oss-20b",
+  "qwen/qwen3.8-27b",
+  "groq/compound",
 ];
 
 /**
  * Ekstraksi regex darurat jika LLM offline
  */
-export function extractContactRegex(text: string): { email?: string; phone?: string } {
-  const emailMatch = text.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i);
+export function extractContactRegex(text: string): {
+  email?: string;
+  phone?: string;
+} {
+  const emailMatch = text.match(
+    /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i,
+  );
   const phoneMatch = text.match(/(?:(?:\+62|62|0)8[1-9][0-9]{7,10})/);
 
   return {
     email: emailMatch ? emailMatch[1] : undefined,
-    phone: phoneMatch ? phoneMatch[0] : undefined
+    phone: phoneMatch ? phoneMatch[0] : undefined,
   };
 }
 
@@ -35,7 +41,7 @@ export async function extractJobFromSocialPost(
     roles: string;
     skills: string;
     city: string;
-  }
+  },
 ): Promise<ExtractedSocialJob> {
   const prompt = `Anda adalah Spesialis Verifikasi dan Ekstraksi Lowongan Kerja Media Sosial (Instagram & TikTok) untuk wilayah Jawa Barat (Sumedang, Bandung Raya, dan sekitarnya).
 
@@ -58,9 +64,9 @@ ${post.caption}
 """
 
 Profil Kandidat:
-- Target Posisi: ${candidateProfile?.roles || 'Fullstack Developer, Software Engineer, Staf Administrasi Publik'}
-- Keahlian: ${candidateProfile?.skills || 'JavaScript, Next.js, Node.js, Administrasi, Arsiparis'}
-- Domisili: ${candidateProfile?.city || 'Sumedang (Bandung Raya)'}
+- Target Posisi: ${candidateProfile?.roles || "Fullstack Developer, Software Engineer, Staf Administrasi Publik"}
+- Keahlian: ${candidateProfile?.skills || "JavaScript, Next.js, Node.js, Administrasi, Arsiparis"}
+- Domisili: ${candidateProfile?.city || "Sumedang (Bandung Raya)"}
 
 Keluarkan HANYA JSON murni dengan format:
 {
@@ -83,37 +89,43 @@ Keluarkan HANYA JSON murni dengan format:
         model,
         messages: [
           {
-            role: 'system',
-            content: 'Anda adalah sistem ekstraksi lowongan kerja resmi berbahasa Indonesia yang menghasilkan JSON valid tanpa formatting markdown di luar blok json.'
+            role: "system",
+            content:
+              "Anda adalah sistem ekstraksi lowongan kerja resmi berbahasa Indonesia yang menghasilkan JSON valid tanpa formatting markdown di luar blok json.",
           },
           {
-            role: 'user',
-            content: prompt
-          }
+            role: "user",
+            content: prompt,
+          },
         ],
         temperature: 0.1,
-        max_tokens: 1000
+        max_tokens: 1000,
       });
 
-      const rawContent = completion.choices[0]?.message?.content?.trim() || '';
+      const rawContent = completion.choices[0]?.message?.content?.trim() || "";
       const cleanJson = rawContent
-        .replace(/^```(?:json)?/gi, '')
-        .replace(/```$/gi, '')
+        .replace(/^```(?:json)?/gi, "")
+        .replace(/```$/gi, "")
         .trim();
 
       const parsed = JSON.parse(cleanJson);
       return {
-        title: parsed.title || 'Posisi Terbuka',
-        companyName: parsed.companyName || 'Perusahaan Terverifikasi',
-        location: parsed.location || 'Sumedang / Bandung',
+        title: parsed.title || "Posisi Terbuka",
+        companyName: parsed.companyName || "Perusahaan Terverifikasi",
+        location: parsed.location || "Sumedang / Bandung",
         salaryRange: parsed.salaryRange || undefined,
         hrdEmail: parsed.hrdEmail || extractContactRegex(post.caption).email,
         hrdPhone: parsed.hrdPhone || extractContactRegex(post.caption).phone,
         applyUrl: parsed.applyUrl || post.postUrl,
-        requirements: Array.isArray(parsed.requirements) ? parsed.requirements : [],
+        requirements: Array.isArray(parsed.requirements)
+          ? parsed.requirements
+          : [],
         isLegitimate: Boolean(parsed.isLegitimate),
-        scamAnalysis: parsed.scamAnalysis || 'Informasi loker terverifikasi dari media sosial.',
-        matchScore: typeof parsed.matchScore === 'number' ? parsed.matchScore : 0.85
+        scamAnalysis:
+          parsed.scamAnalysis ||
+          "Informasi loker terverifikasi dari media sosial.",
+        matchScore:
+          typeof parsed.matchScore === "number" ? parsed.matchScore : 0.85,
       };
     } catch (err: any) {
       console.warn(`[SOCIAL-EXTRACTOR] Model ${model} gagal:`, err.message);
@@ -124,19 +136,21 @@ Keluarkan HANYA JSON murni dengan format:
   // Fallback heuristik jika seluruh pemanggilan LLM gagal
   const regex = extractContactRegex(post.caption);
   return {
-    title: 'Posisi Terbuka (Verifikasi Media Sosial)',
-    companyName: post.sourceAccount.replace(/^@/, '').toUpperCase(),
-    location: post.caption.toLowerCase().includes('sumedang')
-      ? 'Sumedang, Jawa Barat'
-      : post.caption.toLowerCase().includes('bandung')
-        ? 'Bandung, Jawa Barat'
-        : 'Sumedang / Bandung',
+    title: "Posisi Terbuka (Verifikasi Media Sosial)",
+    companyName: post.sourceAccount.replace(/^@/, "").toUpperCase(),
+    location: post.caption.toLowerCase().includes("sumedang")
+      ? "Sumedang, Jawa Barat"
+      : post.caption.toLowerCase().includes("bandung")
+        ? "Bandung, Jawa Barat"
+        : "Sumedang / Bandung",
     hrdEmail: regex.email,
     hrdPhone: regex.phone,
     applyUrl: post.postUrl,
-    requirements: ['Informasi kualifikasi tersedia pada tautan postingan asli.'],
+    requirements: [
+      "Informasi kualifikasi tersedia pada tautan postingan asli.",
+    ],
     isLegitimate: true,
-    scamAnalysis: 'Data diekstraksi dari akun media sosial terpercaya.',
-    matchScore: 0.8
+    scamAnalysis: "Data diekstraksi dari akun media sosial terpercaya.",
+    matchScore: 0.8,
   };
 }

@@ -1,4 +1,5 @@
-export type SocialPlatform = 'INSTAGRAM' | 'TIKTOK';
+import { config } from "../../config/env";
+export type SocialPlatform = "INSTAGRAM" | "TIKTOK";
 
 export interface RawSocialPost {
   id: string;

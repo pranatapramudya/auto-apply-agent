@@ -1,3 +1,4 @@
+import { config } from "../../config/env";
 /**
  * Definisi Tipe dan Interface untuk Scraper Engine
  */

@@ -1,6 +1,8 @@
-import Groq from 'groq-sdk';
+import { config } from "../../config/env";
+import Groq from "groq-sdk";
 
-export type DetectedEmailLifecycle = 'INTERVIEW' | 'REJECTED' | 'UNDER_REVIEW' | 'UNKNOWN';
+export type DetectedEmailLifecycle =
+  "INTERVIEW" | "REJECTED" | "UNDER_REVIEW" | "UNKNOWN";
 
 export interface EmailScanResult {
   lifecycleStatus: DetectedEmailLifecycle;
@@ -22,9 +24,9 @@ let groqClientInstance: Groq | null = null;
 
 function getGroqClient(): Groq {
   if (!groqClientInstance) {
-    const apiKey = process.env.GROQ_API_KEY;
+    const apiKey = config.ai.groqKey;
     if (!apiKey) {
-      throw new Error('GROQ_API_KEY tidak ditemukan di environment variables!');
+      throw new Error("GROQ_API_KEY tidak ditemukan di environment variables!");
     }
     groqClientInstance = new Groq({ apiKey });
   }
@@ -32,10 +34,10 @@ function getGroqClient(): Groq {
 }
 
 const GROQ_MODELS = [
-  'openai/gpt-oss-120b',
-  'openai/gpt-oss-20b',
-  'qwen/qwen3.8-27b',
-  'groq/compound'
+  "openai/gpt-oss-120b",
+  "openai/gpt-oss-20b",
+  "qwen/qwen3.8-27b",
+  "groq/compound",
 ];
 
 /**
@@ -43,13 +45,24 @@ const GROQ_MODELS = [
  * Menganalisis respon email dari HRD/perusahaan untuk mendeteksi apakah pelamar
  * mendapatkan panggilan wawancara, penolakan, atau konfirmasi berkas sedang ditinjau.
  */
-export async function parseRecruitmentEmail(email: IncomingEmailInput): Promise<EmailScanResult> {
+export async function parseRecruitmentEmail(
+  email: IncomingEmailInput,
+): Promise<EmailScanResult> {
   const combinedText = `${email.subject}\n${email.body}`.toLowerCase();
 
   // 1. Fast heuristic path
-  const isInterview = /(invitation|interview|undangan\s*wawancara|user\s*interview|hr\s*interview|jadwal\s*interview|technical\s*test|tes\s*teknis)/i.test(combinedText);
-  const isRejection = /(regret|unfortunately|not\s*moving\s*forward|belum\s*dapat\s*melanjutkan|posisi\s*lain|terima\s*kasih\s*atas\s*partisipasi)/i.test(combinedText);
-  const isReview = /(application\s*received|lamaran\s*diterima|berkas\s*diterima|sedang\s*ditinjau|under\s*review)/i.test(combinedText);
+  const isInterview =
+    /(invitation|interview|undangan\s*wawancara|user\s*interview|hr\s*interview|jadwal\s*interview|technical\s*test|tes\s*teknis)/i.test(
+      combinedText,
+    );
+  const isRejection =
+    /(regret|unfortunately|not\s*moving\s*forward|belum\s*dapat\s*melanjutkan|posisi\s*lain|terima\s*kasih\s*atas\s*partisipasi)/i.test(
+      combinedText,
+    );
+  const isReview =
+    /(application\s*received|lamaran\s*diterima|berkas\s*diterima|sedang\s*ditinjau|under\s*review)/i.test(
+      combinedText,
+    );
 
   // 2. Groq LLM Classifier untuk ketepatan konteks tinggi
   try {
@@ -81,12 +94,12 @@ ${email.body.slice(0, 2000)}`;
       try {
         const completion = await groq.chat.completions.create({
           messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt }
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
           ],
           model,
           temperature: 0.1,
-          response_format: { type: 'json_object' }
+          response_format: { type: "json_object" },
         });
 
         const content = completion.choices[0]?.message?.content;
@@ -98,45 +111,51 @@ ${email.body.slice(0, 2000)}`;
               companyName: parsed.companyName,
               roleTitle: parsed.roleTitle,
               confidence: parsed.confidence || 0.9,
-              reasoning: parsed.reasoning || '',
-              nextSteps: parsed.nextSteps
+              reasoning: parsed.reasoning || "",
+              nextSteps: parsed.nextSteps,
             };
           }
         }
       } catch (err: any) {
-        console.warn(`[EMAIL-TRACKER] Percobaan model ${model} gagal:`, err.message);
+        console.warn(
+          `[EMAIL-TRACKER] Percobaan model ${model} gagal:`,
+          err.message,
+        );
       }
     }
   } catch (err: any) {
-    console.warn('[EMAIL-TRACKER] Fallback ke heuristik regex:', err.message);
+    console.warn("[EMAIL-TRACKER] Fallback ke heuristik regex:", err.message);
   }
 
   // Fallback Heuristik
   if (isInterview) {
     return {
-      lifecycleStatus: 'INTERVIEW',
+      lifecycleStatus: "INTERVIEW",
       confidence: 0.85,
-      reasoning: 'Terdeteksi kata kunci undangan wawancara atau tes teknis dalam subjek/isi email.'
+      reasoning:
+        "Terdeteksi kata kunci undangan wawancara atau tes teknis dalam subjek/isi email.",
     };
   }
   if (isRejection) {
     return {
-      lifecycleStatus: 'REJECTED',
+      lifecycleStatus: "REJECTED",
       confidence: 0.85,
-      reasoning: 'Terdeteksi kata kunci penolakan formal atau penyampaian belum dapat melanjutkan.'
+      reasoning:
+        "Terdeteksi kata kunci penolakan formal atau penyampaian belum dapat melanjutkan.",
     };
   }
   if (isReview) {
     return {
-      lifecycleStatus: 'UNDER_REVIEW',
+      lifecycleStatus: "UNDER_REVIEW",
       confidence: 0.8,
-      reasoning: 'Konfirmasi penerimaan berkas lamaran.'
+      reasoning: "Konfirmasi penerimaan berkas lamaran.",
     };
   }
 
   return {
-    lifecycleStatus: 'UNKNOWN',
+    lifecycleStatus: "UNKNOWN",
     confidence: 0.5,
-    reasoning: 'Email tidak mencantumkan status kelanjutan rekrutmen yang spesifik.'
+    reasoning:
+      "Email tidak mencantumkan status kelanjutan rekrutmen yang spesifik.",
   };
 }

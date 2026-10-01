@@ -1,7 +1,8 @@
-import nodemailer from 'nodemailer';
-import fs from 'fs';
-import path from 'path';
-import { EmailDispatchParams, EmailDispatchResult } from './types';
+import { config } from "../../config/env";
+import nodemailer from "nodemailer";
+import fs from "fs";
+import path from "path";
+import { EmailDispatchParams, EmailDispatchResult } from "./types";
 
 /**
  * Konversi teks biasa (plain text) menjadi HTML yang terformat rapi untuk email
@@ -9,8 +10,11 @@ import { EmailDispatchParams, EmailDispatchResult } from './types';
 function formatEmailHtml(text: string, candidateName: string): string {
   const paragraphs = text
     .split(/\n\n+/)
-    .map((p) => `<p style="margin: 0 0 16px 0; line-height: 1.6; color: #1e293b;">${p.replace(/\n/g, '<br/>')}</p>`)
-    .join('');
+    .map(
+      (p) =>
+        `<p style="margin: 0 0 16px 0; line-height: 1.6; color: #1e293b;">${p.replace(/\n/g, "<br/>")}</p>`,
+    )
+    .join("");
 
   return `
 <!DOCTYPE html>
@@ -35,7 +39,9 @@ function formatEmailHtml(text: string, candidateName: string): string {
  * Mesin Pengirim Email Lamaran Otomatis (Direct HRD Dispatcher)
  * Mendukung Mode Simulasi (Dry-Run / Preview) dan Mode Kirim Asli (Live Send)
  */
-export async function dispatchApplicationEmail(params: EmailDispatchParams): Promise<EmailDispatchResult> {
+export async function dispatchApplicationEmail(
+  params: EmailDispatchParams,
+): Promise<EmailDispatchResult> {
   const sentAt = new Date().toISOString();
   const isDryRun = params.isDryRun ?? true;
 
@@ -43,43 +49,49 @@ export async function dispatchApplicationEmail(params: EmailDispatchParams): Pro
   const resolvedPdfPath = path.resolve(process.cwd(), params.resumePdfPath);
   const pdfExists = fs.existsSync(resolvedPdfPath);
   if (!pdfExists) {
-    console.warn(`[EMAIL-DISPATCHER] Peringatan: File CV PDF tidak ditemukan di ${resolvedPdfPath}`);
+    console.warn(
+      `[EMAIL-DISPATCHER] Peringatan: File CV PDF tidak ditemukan di ${resolvedPdfPath}`,
+    );
   }
 
   // 2. Jika Mode Simulasi (Dry-Run)
   if (isDryRun) {
-    console.log('\n========================================================');
-    console.log('🛡️ [EMAIL DISPATCHER - MODE SIMULASI (DRY-RUN)]');
+    console.log("\n========================================================");
+    console.log("🛡️ [EMAIL DISPATCHER - MODE SIMULASI (DRY-RUN)]");
     console.log(`Penerima  : ${params.toEmail}`);
     console.log(`Subjek    : ${params.subject}`);
-    console.log(`Kandidat  : ${params.candidateName} <${params.candidateEmail}>`);
-    console.log(`Perusahaan: ${params.companyName || '-'}`);
-    console.log(`Lampiran  : ${pdfExists ? path.basename(resolvedPdfPath) : 'File PDF tidak ditemukan'}`);
-    console.log('--------------------------------------------------------');
-    console.log('Isi Surat Lamaran:');
+    console.log(
+      `Kandidat  : ${params.candidateName} <${params.candidateEmail}>`,
+    );
+    console.log(`Perusahaan: ${params.companyName || "-"}`);
+    console.log(
+      `Lampiran  : ${pdfExists ? path.basename(resolvedPdfPath) : "File PDF tidak ditemukan"}`,
+    );
+    console.log("--------------------------------------------------------");
+    console.log("Isi Surat Lamaran:");
     console.log(params.bodyText);
-    console.log('========================================================\n');
+    console.log("========================================================\n");
 
     return {
       success: true,
-      mode: 'DRY_RUN',
+      mode: "DRY_RUN",
       to: params.toEmail,
       subject: params.subject,
       sentAt,
-      messageId: `simulated-${Date.now()}`
+      messageId: `simulated-${Date.now()}`,
     };
   }
 
   // 3. Mode Pengiriman Asli (Live Send) via SMTP
-  const smtpHost = process.env.SMTP_HOST;
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASS;
-  const smtpPort = Number(process.env.SMTP_PORT) || 587;
-  const smtpSecure = process.env.SMTP_SECURE === 'true' || smtpPort === 465;
+  const smtpHost = config.smtp.host;
+  const smtpUser = config.smtp.user;
+  const smtpPass = config.smtp.pass;
+  const smtpPort = Number(config.smtp.port) || 587;
+  const smtpSecure = config.smtp.secure;
 
   if (!smtpHost || !smtpUser || !smtpPass) {
     throw new Error(
-      'Kredensial SMTP belum lengkap di file .env (Membutuhkan SMTP_HOST, SMTP_USER, SMTP_PASS). Gunakan Mode Simulasi (Dry-Run) atau lengkapi .env terlebih dahulu.'
+      "Kredensial SMTP belum lengkap di file .env (Membutuhkan SMTP_HOST, SMTP_USER, SMTP_PASS). Gunakan Mode Simulasi (Dry-Run) atau lengkapi .env terlebih dahulu.",
     );
   }
 
@@ -89,8 +101,8 @@ export async function dispatchApplicationEmail(params: EmailDispatchParams): Pro
     secure: smtpSecure,
     auth: {
       user: smtpUser,
-      pass: smtpPass
-    }
+      pass: smtpPass,
+    },
   });
 
   const attachments = [];
@@ -98,11 +110,12 @@ export async function dispatchApplicationEmail(params: EmailDispatchParams): Pro
     attachments.push({
       filename: path.basename(resolvedPdfPath),
       path: resolvedPdfPath,
-      contentType: 'application/pdf'
+      contentType: "application/pdf",
     });
   }
 
-  const htmlContent = params.bodyHtml || formatEmailHtml(params.bodyText, params.candidateName);
+  const htmlContent =
+    params.bodyHtml || formatEmailHtml(params.bodyText, params.candidateName);
 
   const mailOptions = {
     from: `"${params.candidateName}" <${smtpUser}>`,
@@ -111,18 +124,20 @@ export async function dispatchApplicationEmail(params: EmailDispatchParams): Pro
     subject: params.subject,
     text: params.bodyText,
     html: htmlContent,
-    attachments
+    attachments,
   };
 
   const info = await transporter.sendMail(mailOptions);
-  console.log(`[EMAIL-DISPATCHER] Email sukses terkirim ke ${params.toEmail}. Message ID: ${info.messageId}`);
+  console.log(
+    `[EMAIL-DISPATCHER] Email sukses terkirim ke ${params.toEmail}. Message ID: ${info.messageId}`,
+  );
 
   return {
     success: true,
-    mode: 'LIVE_SEND',
+    mode: "LIVE_SEND",
     messageId: info.messageId,
     to: params.toEmail,
     subject: params.subject,
-    sentAt
+    sentAt,
   };
 }

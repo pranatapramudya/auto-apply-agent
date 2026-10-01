@@ -1,7 +1,8 @@
-import { chromium } from 'playwright';
-import fs from 'fs';
-import path from 'path';
-import { TailoredResumeData, GeneratedPdfResult } from './types';
+import { config } from "../../config/env";
+import { chromium } from "playwright";
+import fs from "fs";
+import path from "path";
+import { TailoredResumeData, GeneratedPdfResult } from "./types";
 
 /**
  * Menghasilkan markup HTML resume berstandar ATS:
@@ -14,14 +15,23 @@ export function renderAtsResumeHtml(data: TailoredResumeData): string {
     data.email,
     data.phone,
     data.city,
-    data.linkedInUrl ? `<a href="${data.linkedInUrl}" style="color: #0f172a; text-decoration: underline;">LinkedIn</a>` : null,
-    data.portfolioUrl ? `<a href="${data.portfolioUrl}" style="color: #0f172a; text-decoration: underline;">Portfolio</a>` : null,
-    data.githubUrl ? `<a href="${data.githubUrl}" style="color: #0f172a; text-decoration: underline;">GitHub</a>` : null
+    data.linkedInUrl
+      ? `<a href="${data.linkedInUrl}" style="color: #0f172a; text-decoration: underline;">LinkedIn</a>`
+      : null,
+    data.portfolioUrl
+      ? `<a href="${data.portfolioUrl}" style="color: #0f172a; text-decoration: underline;">Portfolio</a>`
+      : null,
+    data.githubUrl
+      ? `<a href="${data.githubUrl}" style="color: #0f172a; text-decoration: underline;">GitHub</a>`
+      : null,
   ].filter(Boolean);
 
   const skillsHtml = data.coreCompetencies
-    .map((skill) => `<span style="background: #f1f5f9; color: #1e293b; padding: 3px 8px; border-radius: 4px; font-size: 11px; margin-right: 6px; margin-bottom: 6px; display: inline-block; font-weight: 500;">${skill}</span>`)
-    .join('');
+    .map(
+      (skill) =>
+        `<span style="background: #f1f5f9; color: #1e293b; padding: 3px 8px; border-radius: 4px; font-size: 11px; margin-right: 6px; margin-bottom: 6px; display: inline-block; font-weight: 500;">${skill}</span>`,
+    )
+    .join("");
 
   const experienceHtml = data.workExperience
     .map(
@@ -33,12 +43,12 @@ export function renderAtsResumeHtml(data: TailoredResumeData): string {
       </div>
       <div style="font-size: 12px; color: #334155; margin-bottom: 4px; font-style: italic;">${exp.company}</div>
       <ul style="margin: 4px 0 0 16px; padding: 0; font-size: 11px; color: #334155; line-height: 1.5;">
-        ${exp.bulletPoints.map((b) => `<li style="margin-bottom: 3px;">${b}</li>`).join('')}
+        ${exp.bulletPoints.map((b) => `<li style="margin-bottom: 3px;">${b}</li>`).join("")}
       </ul>
     </div>
-  `
+  `,
     )
-    .join('');
+    .join("");
 
   const projectsHtml = data.projects
     .map(
@@ -50,9 +60,9 @@ export function renderAtsResumeHtml(data: TailoredResumeData): string {
       </div>
       <p style="margin: 2px 0 0 0; font-size: 11px; color: #334155; line-height: 1.4;">${proj.description}</p>
     </div>
-  `
+  `,
     )
-    .join('');
+    .join("");
 
   const educationHtml = data.education
     .map(
@@ -63,9 +73,9 @@ export function renderAtsResumeHtml(data: TailoredResumeData): string {
       </div>
       <span style="color: #64748b;">${edu.year}</span>
     </div>
-  `
+  `,
     )
-    .join('');
+    .join("");
 
   return `
 <!DOCTYPE html>
@@ -110,7 +120,7 @@ export function renderAtsResumeHtml(data: TailoredResumeData): string {
       ${data.targetRole}
     </div>
     <div style="font-size: 11px; color: #475569;">
-      ${contactParts.join(' • ')}
+      ${contactParts.join(" • ")}
     </div>
   </div>
 
@@ -148,14 +158,14 @@ export function renderAtsResumeHtml(data: TailoredResumeData): string {
  */
 export async function renderResumeToPdf(
   resumeData: TailoredResumeData,
-  jobId: string
+  jobId: string,
 ): Promise<GeneratedPdfResult> {
-  const outputDir = path.resolve(process.cwd(), 'logs', 'resumes');
+  const outputDir = path.resolve(process.cwd(), "logs", "resumes");
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
-  const safeName = resumeData.fullName.toLowerCase().replace(/[^a-z0-9]/g, '_');
+  const safeName = resumeData.fullName.toLowerCase().replace(/[^a-z0-9]/g, "_");
   const filename = `resume_${safeName}_${jobId}_${Date.now()}.pdf`;
   const pdfAbsolutePath = path.join(outputDir, filename);
   const pdfRelativePath = `logs/resumes/${filename}`;
@@ -164,23 +174,23 @@ export async function renderResumeToPdf(
 
   const browser = await chromium.launch({
     headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
 
   try {
     const page = await browser.newPage();
-    await page.setContent(htmlContent, { waitUntil: 'load' });
-    
+    await page.setContent(htmlContent, { waitUntil: "load" });
+
     await page.pdf({
       path: pdfAbsolutePath,
-      format: 'A4',
+      format: "A4",
       printBackground: true,
       margin: {
-        top: '16mm',
-        bottom: '16mm',
-        left: '16mm',
-        right: '16mm'
-      }
+        top: "16mm",
+        bottom: "16mm",
+        left: "16mm",
+        right: "16mm",
+      },
     });
   } finally {
     await browser.close();
@@ -191,13 +201,16 @@ export async function renderResumeToPdf(
 
   // Hitung perkiraan kecocokan ATS
   const matchedCount = resumeData.matchedKeywords.length;
-  const atsScoreEstimate = Math.min(0.98, Math.max(0.85, 0.75 + matchedCount * 0.04));
+  const atsScoreEstimate = Math.min(
+    0.98,
+    Math.max(0.85, 0.75 + matchedCount * 0.04),
+  );
 
   return {
     pdfRelativePath,
     pdfAbsolutePath,
     fileSizeBytes,
     atsScoreEstimate,
-    matchedKeywords: resumeData.matchedKeywords
+    matchedKeywords: resumeData.matchedKeywords,
   };
 }

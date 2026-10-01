@@ -1,5 +1,6 @@
-import 'dotenv/config';
-import Groq from 'groq-sdk';
+import { config } from "../../config/env";
+import "dotenv/config";
+import Groq from "groq-sdk";
 
 export interface FormQuestionContext {
   question: string;
@@ -27,9 +28,9 @@ let groqClientInstance: Groq | null = null;
 
 function getGroqClient(): Groq {
   if (!groqClientInstance) {
-    const apiKey = process.env.GROQ_API_KEY;
+    const apiKey = config.ai.groqKey;
     if (!apiKey) {
-      throw new Error('GROQ_API_KEY tidak ditemukan di environment variables!');
+      throw new Error("GROQ_API_KEY tidak ditemukan di environment variables!");
     }
     groqClientInstance = new Groq({ apiKey });
   }
@@ -37,12 +38,12 @@ function getGroqClient(): Groq {
 }
 
 const CANDIDATE_MODELS = [
-  'llama-3.3-70b-versatile',
-  'llama-3.1-8b-instant',
-  'qwen/qwen3.8-27b',
-  'openai/gpt-oss-120b',
-  'openai/gpt-oss-20b',
-  'groq/compound'
+  "llama-3.3-70b-versatile",
+  "llama-3.1-8b-instant",
+  "qwen/qwen3.8-27b",
+  "openai/gpt-oss-120b",
+  "openai/gpt-oss-20b",
+  "groq/compound",
 ];
 
 /**
@@ -50,32 +51,43 @@ const CANDIDATE_MODELS = [
  * Menyelesaikan pertanyaan kuesioner dinamis pada formulir lamaran kerja
  * dengan gaya profesional, singkat (1–3 kalimat), dan selaras dengan skill pelamar.
  */
-export async function resolveFormQuestion(context: FormQuestionContext): Promise<string> {
-  const { question, fieldType, options, placeholder, jobContext, user } = context;
+export async function resolveFormQuestion(
+  context: FormQuestionContext,
+): Promise<string> {
+  const { question, fieldType, options, placeholder, jobContext, user } =
+    context;
 
   // 1. Fast-Path Heuristik untuk Pertanyaan Angka Pengalaman
-  const numExperienceMatch = question.match(/(years?|lama|pengalaman).*(experience|pengalaman)/i) ||
-                             question.match(/how many years/i);
-  if (numExperienceMatch && (fieldType === 'number' || !options || options.length === 0)) {
+  const numExperienceMatch =
+    question.match(/(years?|lama|pengalaman).*(experience|pengalaman)/i) ||
+    question.match(/how many years/i);
+  if (
+    numExperienceMatch &&
+    (fieldType === "number" || !options || options.length === 0)
+  ) {
     // Berikan angka pengalaman proporsional (3-4 tahun)
-    return '4';
+    return "4";
   }
 
   // 2. Fast-Path untuk Sponsorship / Otorisasi Kerja
   if (/authorized to work|hak kerja|ijin kerja/i.test(question)) {
     if (options && options.length > 0) {
-      const yesOpt = options.find((o) => /^yes|^ya|^authorized/i.test(o.trim()));
+      const yesOpt = options.find((o) =>
+        /^yes|^ya|^authorized/i.test(o.trim()),
+      );
       if (yesOpt) return yesOpt;
     }
-    return 'Yes';
+    return "Yes";
   }
 
   if (/require.*sponsorship|butuh sponsor|visa sponsorship/i.test(question)) {
     if (options && options.length > 0) {
-      const noOpt = options.find((o) => /^no|^tidak|^not require/i.test(o.trim()));
+      const noOpt = options.find((o) =>
+        /^no|^tidak|^not require/i.test(o.trim()),
+      );
       if (noOpt) return noOpt;
     }
-    return 'No';
+    return "No";
   }
 
   // 3. AI Resolver via Groq LLM untuk Pertanyaan Kompleks / Esai / Pilihan Ganda
@@ -88,10 +100,10 @@ Candidate Profile:
 - Full Name: ${user.fullName}
 - Target Roles: ${user.targetRoles}
 - Core Skills: ${user.coreSkills}
-- Location: ${user.city || 'Jakarta, Indonesia'}
-- Portfolio: ${user.portfolioUrl || 'N/A'}
-- GitHub: ${user.githubUrl || 'N/A'}
-- Expected Salary: ${user.expectedSalary ? `Rp ${user.expectedSalary.toLocaleString('id-ID')}` : 'Market Rate'}
+- Location: ${user.city || "Jakarta, Indonesia"}
+- Portfolio: ${user.portfolioUrl || "N/A"}
+- GitHub: ${user.githubUrl || "N/A"}
+- Expected Salary: ${user.expectedSalary ? `Rp ${user.expectedSalary.toLocaleString("id-ID")}` : "Market Rate"}
 
 Instructions:
 1. If the question asks for an open-ended explanation (e.g. why join, project experience, tech stack background), write a concise, impressive, and professional response in 1 to 3 sentences maximum. Emphasize actual hands-on engineering experience with ${user.coreSkills}.
@@ -99,29 +111,29 @@ Instructions:
 3. If the question asks for a number (like years of experience), return only the integer or short number.
 4. Output MUST be valid JSON with the exact key "answer": { "answer": "..." }`;
 
-  const userPrompt = `Job Title: ${jobContext?.title || 'Software Engineer'}
-Company: ${jobContext?.companyName || 'Company'}
+  const userPrompt = `Job Title: ${jobContext?.title || "Software Engineer"}
+Company: ${jobContext?.companyName || "Company"}
 Screening Question: "${question}"
-Field Type: ${fieldType || 'text'}
-Placeholder: ${placeholder || 'None'}
-Available Options: ${options && options.length > 0 ? JSON.stringify(options) : 'None'}`;
+Field Type: ${fieldType || "text"}
+Placeholder: ${placeholder || "None"}
+Available Options: ${options && options.length > 0 ? JSON.stringify(options) : "None"}`;
 
   for (const model of CANDIDATE_MODELS) {
     try {
       const completion = await groq.chat.completions.create({
         model,
         messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
         ],
         temperature: 0.2,
-        response_format: { type: 'json_object' }
+        response_format: { type: "json_object" },
       });
 
       const raw = completion.choices[0]?.message?.content;
       if (raw) {
         const parsed = JSON.parse(raw);
-        if (parsed.answer && typeof parsed.answer === 'string') {
+        if (parsed.answer && typeof parsed.answer === "string") {
           return parsed.answer.trim();
         }
       }

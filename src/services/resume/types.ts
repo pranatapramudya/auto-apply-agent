@@ -1,3 +1,4 @@
+import { config } from "../../config/env";
 export interface TailoredResumeData {
   fullName: string;
   targetRole: string;
