@@ -1,13 +1,14 @@
-import prisma from '../lib/prisma';
-import { RawJobListing } from './scraper/types';
-import { evaluateJob, JobEvaluationResult } from './job-evaluator';
+import { config } from "../config/env";
+import prisma from "../lib/prisma";
+import { RawJobListing } from "./scraper/types";
+import { evaluateJob, JobEvaluationResult } from "./job-evaluator";
 
 export interface IngestedJobDetail {
   id: string;
   title: string;
   companyName: string;
   jobUrl: string;
-  status: 'DISCOVERED' | 'FILTERED_OUT';
+  status: "DISCOVERED" | "FILTERED_OUT";
   isLegit: boolean;
   matchScore: number | null;
   reason?: string | null;
@@ -30,7 +31,7 @@ export interface IngestionSummary {
  */
 export async function ingestRawJobs(
   userId: string,
-  rawJobs: RawJobListing[]
+  rawJobs: RawJobListing[],
 ): Promise<IngestionSummary> {
   const summary: IngestionSummary = {
     userId,
@@ -39,10 +40,12 @@ export async function ingestRawJobs(
     skippedDuplicates: 0,
     passedEvaluation: 0,
     filteredOut: 0,
-    details: []
+    details: [],
   };
 
-  console.log(`\n[INGESTION] Memulai ingestion ${rawJobs.length} lowongan untuk User ID: ${userId}`);
+  console.log(
+    `\n[INGESTION] Memulai ingestion ${rawJobs.length} lowongan untuk User ID: ${userId}`,
+  );
 
   for (const rawJob of rawJobs) {
     try {
@@ -51,13 +54,15 @@ export async function ingestRawJobs(
         where: {
           userId_jobUrl: {
             userId,
-            jobUrl: rawJob.jobUrl
-          }
-        }
+            jobUrl: rawJob.jobUrl,
+          },
+        },
       });
 
       if (existing) {
-        console.log(`[INGESTION-SKIP] Duplikat ditemukan: "${rawJob.title}" @ ${rawJob.companyName}`);
+        console.log(
+          `[INGESTION-SKIP] Duplikat ditemukan: "${rawJob.title}" @ ${rawJob.companyName}`,
+        );
         summary.skippedDuplicates++;
         continue;
       }
@@ -74,23 +79,29 @@ export async function ingestRawJobs(
           location: rawJob.location,
           salaryRange: rawJob.salaryRange,
           description: rawJob.description,
-          status: 'DISCOVERED'
-        }
+          status: "DISCOVERED",
+        },
       });
 
       summary.inserted++;
-      console.log(`[INGESTION-NEW] Tersimpan ke DB: "${created.title}" @ ${created.companyName} (ID: ${created.id})`);
+      console.log(
+        `[INGESTION-NEW] Tersimpan ke DB: "${created.title}" @ ${created.companyName} (ID: ${created.id})`,
+      );
 
       // 3. Trigger Filter Otomatis (Dual-Layer Filter)
       console.log(`[INGESTION-EVAL] Mengevaluasi ID: ${created.id}...`);
       const evalResult: JobEvaluationResult = await evaluateJob(created.id);
 
-      if (evalResult.finalStatus === 'DISCOVERED') {
+      if (evalResult.finalStatus === "DISCOVERED") {
         summary.passedEvaluation++;
-        console.log(`  -> ✅ LOLOS FILTER (Match: ${evalResult.matchScore?.toFixed(2)})`);
+        console.log(
+          `  -> ✅ LOLOS FILTER (Match: ${evalResult.matchScore?.toFixed(2)})`,
+        );
       } else {
         summary.filteredOut++;
-        console.log(`  -> ❌ FILTERED OUT (${evalResult.scamReason || evalResult.failureReason || 'Mismatch'})`);
+        console.log(
+          `  -> ❌ FILTERED OUT (${evalResult.scamReason || evalResult.failureReason || "Mismatch"})`,
+        );
       }
 
       summary.details.push({
@@ -101,14 +112,19 @@ export async function ingestRawJobs(
         status: evalResult.finalStatus,
         isLegit: evalResult.isLegit,
         matchScore: evalResult.matchScore ?? null,
-        reason: evalResult.scamReason || evalResult.failureReason || null
+        reason: evalResult.scamReason || evalResult.failureReason || null,
       });
     } catch (err: any) {
-      console.error(`[INGESTION-ERROR] Gagal memproses lowongan "${rawJob.title}":`, err.message);
+      console.error(
+        `[INGESTION-ERROR] Gagal memproses lowongan "${rawJob.title}":`,
+        err.message,
+      );
     }
   }
 
-  console.log(`[INGESTION] Selesai. Total: ${summary.totalReceived} | Masuk: ${summary.inserted} | Duplikat dilewati: ${summary.skippedDuplicates} | Lolos: ${summary.passedEvaluation} | Dibuang: ${summary.filteredOut}\n`);
+  console.log(
+    `[INGESTION] Selesai. Total: ${summary.totalReceived} | Masuk: ${summary.inserted} | Duplikat dilewati: ${summary.skippedDuplicates} | Lolos: ${summary.passedEvaluation} | Dibuang: ${summary.filteredOut}\n`,
+  );
   return summary;
 }
 

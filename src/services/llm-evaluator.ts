@@ -1,13 +1,14 @@
-import 'dotenv/config';
-import Groq from 'groq-sdk';
-import applicant, { ApplicantConfig } from '../config/applicant';
+import { config } from "../config/env";
+import "dotenv/config";
+import Groq from "groq-sdk";
+import applicant, { ApplicantConfig } from "../config/applicant";
 
 export interface LLMEvaluationResult {
   isLegit: boolean;
   scamRiskScore: number; // 0.0 to 1.0
-  matchScore: number;    // 0.0 to 1.0
-  reasoning: string;     // Ringkasan 1-2 kalimat
-  recommendation: 'APPLY' | 'REJECT';
+  matchScore: number; // 0.0 to 1.0
+  reasoning: string; // Ringkasan 1-2 kalimat
+  recommendation: "APPLY" | "REJECT";
 }
 
 export interface JobToEvaluate {
@@ -20,9 +21,9 @@ let groqClientInstance: Groq | null = null;
 
 function getGroqClient(): Groq {
   if (!groqClientInstance) {
-    const apiKey = process.env.GROQ_API_KEY;
+    const apiKey = config.ai.groqKey;
     if (!apiKey) {
-      throw new Error('GROQ_API_KEY tidak ditemukan di environment variables!');
+      throw new Error("GROQ_API_KEY tidak ditemukan di environment variables!");
     }
     groqClientInstance = new Groq({ apiKey });
   }
@@ -30,18 +31,19 @@ function getGroqClient(): Groq {
 }
 
 const CANDIDATE_MODELS = [
-  'llama-3.3-70b-versatile',
-  'llama-3.1-8b-instant',
-  'qwen/qwen3.8-27b',
-  'openai/gpt-oss-120b',
-  'openai/gpt-oss-20b',
-  'groq/compound'
+  "llama-3.3-70b-versatile",
+  "llama-3.1-8b-instant",
+  "qwen/qwen3.8-27b",
+  "openai/gpt-oss-120b",
+  "openai/gpt-oss-20b",
+  "groq/compound",
 ];
 
 function buildSystemPrompt(applicantProfile: ApplicantConfig): string {
-  const targetRoles = applicantProfile.targetRoles && applicantProfile.targetRoles.length > 0
-    ? applicantProfile.targetRoles.join(', ')
-    : 'Professional Roles';
+  const targetRoles =
+    applicantProfile.targetRoles && applicantProfile.targetRoles.length > 0
+      ? applicantProfile.targetRoles.join(", ")
+      : "Professional Roles";
 
   return `You are an expert Talent Acquisition & Anti-Scam Intelligence Evaluator for professional job listings in Indonesia.
 Your task is to analyze a job listing for an applicant and determine:
@@ -51,7 +53,7 @@ Your task is to analyze a job listing for an applicant and determine:
 Applicant Profile:
 - Full Name: ${applicantProfile.fullName}
 - Target Roles: ${targetRoles}
-- Core Skills: ${applicantProfile.skills.join(', ')}
+- Core Skills: ${applicantProfile.skills.join(", ")}
 - Location: ${applicantProfile.city}
 
 Evaluation Rules:
@@ -78,16 +80,16 @@ async function callGroqWithModel(
   groq: Groq,
   model: string,
   systemPrompt: string,
-  userPrompt: string
+  userPrompt: string,
 ): Promise<string> {
   const completion = await groq.chat.completions.create({
     model,
     messages: [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt }
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
     ],
     temperature: 0.1,
-    response_format: { type: 'json_object' }
+    response_format: { type: "json_object" },
   });
 
   const content = completion.choices[0]?.message?.content;
@@ -102,7 +104,7 @@ async function callGroqWithModel(
  */
 export async function evaluateJobWithLLM(
   job: JobToEvaluate,
-  applicantProfile: ApplicantConfig = applicant
+  applicantProfile: ApplicantConfig = applicant,
 ): Promise<LLMEvaluationResult> {
   const groq = getGroqClient();
   const systemPrompt = buildSystemPrompt(applicantProfile);
@@ -128,40 +130,56 @@ ${job.description.slice(0, 4000)}`;
   }
 
   if (!rawJson) {
-    console.error('[LLM-EVALUATOR] Seluruh model kandidat gagal:', lastError?.message);
+    console.error(
+      "[LLM-EVALUATOR] Seluruh model kandidat gagal:",
+      lastError?.message,
+    );
     return {
       isLegit: true,
       scamRiskScore: 0.2,
       matchScore: 0.5,
-      reasoning: `LLM evaluation API error (${lastError?.message || 'Unknown'}). Fallback default applied.`,
-      recommendation: 'REJECT'
+      reasoning: `LLM evaluation API error (${lastError?.message || "Unknown"}). Fallback default applied.`,
+      recommendation: "REJECT",
     };
   }
 
   try {
     const parsed = JSON.parse(rawJson);
-    const scamRiskScore = typeof parsed.scamRiskScore === 'number' ? Math.max(0, Math.min(1, parsed.scamRiskScore)) : 0.0;
-    const matchScore = typeof parsed.matchScore === 'number' ? Math.max(0, Math.min(1, parsed.matchScore)) : 0.0;
-    const isLegit = typeof parsed.isLegit === 'boolean' ? parsed.isLegit : scamRiskScore < 0.4;
-    const recommendation = (parsed.recommendation === 'APPLY' || parsed.recommendation === 'REJECT')
-      ? parsed.recommendation
-      : (isLegit && matchScore >= 0.6 ? 'APPLY' : 'REJECT');
+    const scamRiskScore =
+      typeof parsed.scamRiskScore === "number"
+        ? Math.max(0, Math.min(1, parsed.scamRiskScore))
+        : 0.0;
+    const matchScore =
+      typeof parsed.matchScore === "number"
+        ? Math.max(0, Math.min(1, parsed.matchScore))
+        : 0.0;
+    const isLegit =
+      typeof parsed.isLegit === "boolean"
+        ? parsed.isLegit
+        : scamRiskScore < 0.4;
+    const recommendation =
+      parsed.recommendation === "APPLY" || parsed.recommendation === "REJECT"
+        ? parsed.recommendation
+        : isLegit && matchScore >= 0.6
+          ? "APPLY"
+          : "REJECT";
 
     return {
       isLegit,
       scamRiskScore,
       matchScore,
-      reasoning: parsed.reasoning || 'Evaluasi berhasil diproses oleh model LLM.',
-      recommendation
+      reasoning:
+        parsed.reasoning || "Evaluasi berhasil diproses oleh model LLM.",
+      recommendation,
     };
   } catch (parseError: any) {
-    console.warn('[LLM-EVALUATOR] Gagal parse JSON hasil output LLM:', rawJson);
+    console.warn("[LLM-EVALUATOR] Gagal parse JSON hasil output LLM:", rawJson);
     return {
       isLegit: true,
       scamRiskScore: 0.3,
       matchScore: 0.5,
-      reasoning: 'Gagal mengurai respons JSON dari model LLM.',
-      recommendation: 'REJECT'
+      reasoning: "Gagal mengurai respons JSON dari model LLM.",
+      recommendation: "REJECT",
     };
   }
 }

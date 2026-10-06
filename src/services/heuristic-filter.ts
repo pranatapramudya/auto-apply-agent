@@ -1,3 +1,4 @@
+import { config } from "../config/env";
 /**
  * Layer 1: Heuristic Filter (Deterministic / Fast-Path)
  * Menangkap red-flag scam instan menggunakan Regex tanpa membuang kuota token LLM.
@@ -42,7 +43,9 @@ const RED_FLAG_CONTACT_PATTERNS: RegExp[] = [
  * Memfilter konten pekerjaan secara heuristik.
  * @param job Objek pekerjaan minimal berisi description
  */
-export function filterJobHeuristic(job: JobContentInput): HeuristicFilterResult {
+export function filterJobHeuristic(
+  job: JobContentInput,
+): HeuristicFilterResult {
   const desc = (job.description || "").trim();
 
   // 1. Validasi panjang deskripsi (minimal 100 karakter)

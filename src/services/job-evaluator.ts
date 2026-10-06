@@ -1,14 +1,15 @@
-import prisma from '../lib/prisma';
-import { filterJobHeuristic } from './heuristic-filter';
-import { evaluateJobWithLLM, LLMEvaluationResult } from './llm-evaluator';
-import applicant, { ApplicantConfig } from '../config/applicant';
+import { config } from "../config/env";
+import prisma from "../lib/prisma";
+import { filterJobHeuristic } from "./heuristic-filter";
+import { evaluateJobWithLLM, LLMEvaluationResult } from "./llm-evaluator";
+import applicant, { ApplicantConfig } from "../config/applicant";
 
 export interface JobEvaluationResult {
   jobListingId?: string;
   passedHeuristic: boolean;
   heuristicReason?: string;
   llmResult?: LLMEvaluationResult;
-  finalStatus: 'DISCOVERED' | 'FILTERED_OUT';
+  finalStatus: "DISCOVERED" | "FILTERED_OUT";
   isLegit: boolean;
   matchScore?: number | null;
   scamReason?: string | null;
@@ -27,13 +28,13 @@ export interface DirectJobInput {
  */
 export async function evaluateJobContent(
   job: DirectJobInput,
-  applicantProfile: ApplicantConfig = applicant
+  applicantProfile: ApplicantConfig = applicant,
 ): Promise<JobEvaluationResult> {
   // 1. Layer 1: Heuristic Filter (Deterministic / Fast-Path)
   const heuristic = filterJobHeuristic({
     title: job.title,
     companyName: job.companyName,
-    description: job.description
+    description: job.description,
   });
 
   if (!heuristic.passed) {
@@ -41,11 +42,11 @@ export async function evaluateJobContent(
       jobListingId: job.id,
       passedHeuristic: false,
       heuristicReason: heuristic.reason,
-      finalStatus: 'FILTERED_OUT',
+      finalStatus: "FILTERED_OUT",
       isLegit: false,
       matchScore: 0.0,
       scamReason: heuristic.reason,
-      failureReason: heuristic.reason
+      failureReason: heuristic.reason,
     };
   }
 
@@ -54,9 +55,9 @@ export async function evaluateJobContent(
     {
       title: job.title,
       companyName: job.companyName,
-      description: job.description
+      description: job.description,
     },
-    applicantProfile
+    applicantProfile,
   );
 
   // Jika terindikasi scam dari evaluasi LLM
@@ -65,11 +66,11 @@ export async function evaluateJobContent(
       jobListingId: job.id,
       passedHeuristic: true,
       llmResult,
-      finalStatus: 'FILTERED_OUT',
+      finalStatus: "FILTERED_OUT",
       isLegit: false,
       matchScore: llmResult.matchScore,
       scamReason: `Terdeteksi scam oleh AI: ${llmResult.reasoning}`,
-      failureReason: `Scam risk tinggi (${llmResult.scamRiskScore.toFixed(2)}): ${llmResult.reasoning}`
+      failureReason: `Scam risk tinggi (${llmResult.scamRiskScore.toFixed(2)}): ${llmResult.reasoning}`,
     };
   }
 
@@ -79,11 +80,11 @@ export async function evaluateJobContent(
       jobListingId: job.id,
       passedHeuristic: true,
       llmResult,
-      finalStatus: 'DISCOVERED', // Siap untuk tahap APPLYING
+      finalStatus: "DISCOVERED", // Siap untuk tahap APPLYING
       isLegit: true,
       matchScore: llmResult.matchScore,
       scamReason: null,
-      failureReason: null
+      failureReason: null,
     };
   }
 
@@ -92,11 +93,11 @@ export async function evaluateJobContent(
     jobListingId: job.id,
     passedHeuristic: true,
     llmResult,
-    finalStatus: 'FILTERED_OUT',
+    finalStatus: "FILTERED_OUT",
     isLegit: true,
     matchScore: llmResult.matchScore,
     scamReason: null,
-    failureReason: `Skor relevansi skill (${llmResult.matchScore.toFixed(2)}) di bawah ambang batas minimum 0.6. ${llmResult.reasoning}`
+    failureReason: `Skor relevansi skill (${llmResult.matchScore.toFixed(2)}) di bawah ambang batas minimum 0.6. ${llmResult.reasoning}`,
   };
 }
 
@@ -104,10 +105,12 @@ export async function evaluateJobContent(
  * Orchestrator Utama: Mengevaluasi record JobListing berdasarkan ID dari database,
  * dan langsung memperbarui record tersebut di Prisma.
  */
-export async function evaluateJob(jobListingId: string): Promise<JobEvaluationResult> {
+export async function evaluateJob(
+  jobListingId: string,
+): Promise<JobEvaluationResult> {
   const job = await prisma.jobListing.findUnique({
     where: { id: jobListingId },
-    include: { user: true }
+    include: { user: true },
   });
 
   if (!job) {
@@ -117,7 +120,10 @@ export async function evaluateJob(jobListingId: string): Promise<JobEvaluationRe
   let applicantProfile = applicant;
   if (job.user) {
     const targetRoles = job.user.targetRoles
-      ? job.user.targetRoles.split(',').map((r) => r.trim()).filter(Boolean)
+      ? job.user.targetRoles
+          .split(",")
+          .map((r) => r.trim())
+          .filter(Boolean)
       : undefined;
 
     applicantProfile = {
@@ -128,12 +134,17 @@ export async function evaluateJob(jobListingId: string): Promise<JobEvaluationRe
       linkedInUrl: job.user.linkedInUrl || applicant.linkedInUrl,
       githubUrl: job.user.githubUrl || applicant.githubUrl,
       portfolioUrl: job.user.portfolioUrl || applicant.portfolioUrl,
-      expectedSalary: job.user.expectedSalary ? `Rp ${job.user.expectedSalary.toLocaleString('id-ID')}` : applicant.expectedSalary,
+      expectedSalary: job.user.expectedSalary
+        ? `Rp ${job.user.expectedSalary.toLocaleString("id-ID")}`
+        : applicant.expectedSalary,
       noticePeriodDays: applicant.noticePeriodDays,
       workAuthorization: applicant.workAuthorization,
       targetRoles,
-      skills: job.user.coreSkills.split(',').map((s) => s.trim()).filter(Boolean),
-      resumePath: job.user.resumeLocalPath || applicant.resumePath
+      skills: job.user.coreSkills
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
+      resumePath: job.user.resumeLocalPath || applicant.resumePath,
     };
   }
 
@@ -142,9 +153,9 @@ export async function evaluateJob(jobListingId: string): Promise<JobEvaluationRe
       id: job.id,
       title: job.title,
       companyName: job.companyName,
-      description: job.description
+      description: job.description,
     },
-    applicantProfile
+    applicantProfile,
   );
 
   // Perbarui status dan metrik pada database Prisma
@@ -155,8 +166,8 @@ export async function evaluateJob(jobListingId: string): Promise<JobEvaluationRe
       isLegit: result.isLegit,
       matchScore: result.matchScore,
       scamReason: result.scamReason,
-      failureReason: result.failureReason
-    }
+      failureReason: result.failureReason,
+    },
   });
 
   return result;
@@ -164,5 +175,5 @@ export async function evaluateJob(jobListingId: string): Promise<JobEvaluationRe
 
 export default {
   evaluateJob,
-  evaluateJobContent
+  evaluateJobContent,
 };

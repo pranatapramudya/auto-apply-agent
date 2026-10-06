@@ -1,11 +1,17 @@
-import { chromium, Browser, BrowserContext, Page } from 'playwright';
-import fs from 'fs';
-import path from 'path';
-import { identifyFieldType, getStandardFieldValue, isHoneypotField, FieldElementInfo } from './field-matcher';
-import { resolveFormQuestion } from './form-resolver';
-import { applyStealthEvasions, humanTypeIntoField } from './stealth';
-import { generateTailoredResumeData } from '../resume/resume-tailor';
-import { renderResumeToPdf } from '../resume/pdf-generator';
+import { config } from "../../config/env";
+import { chromium, Browser, BrowserContext, Page } from "playwright";
+import fs from "fs";
+import path from "path";
+import {
+  identifyFieldType,
+  getStandardFieldValue,
+  isHoneypotField,
+  FieldElementInfo,
+} from "./field-matcher";
+import { resolveFormQuestion } from "./form-resolver";
+import { applyStealthEvasions, humanTypeIntoField } from "./stealth";
+import { generateTailoredResumeData } from "../resume/resume-tailor";
+import { renderResumeToPdf } from "../resume/pdf-generator";
 
 export interface ApplyEngineOptions {
   dryRun?: boolean;
@@ -57,16 +63,17 @@ export interface UserToApply {
  */
 export class PlaywrightApplyEngine {
   private ensureDirectories() {
-    const screenshotDir = path.resolve(process.cwd(), 'logs', 'screenshots');
-    const errorDir = path.resolve(process.cwd(), 'logs', 'errors');
-    if (!fs.existsSync(screenshotDir)) fs.mkdirSync(screenshotDir, { recursive: true });
+    const screenshotDir = path.resolve(process.cwd(), "logs", "screenshots");
+    const errorDir = path.resolve(process.cwd(), "logs", "errors");
+    if (!fs.existsSync(screenshotDir))
+      fs.mkdirSync(screenshotDir, { recursive: true });
     if (!fs.existsSync(errorDir)) fs.mkdirSync(errorDir, { recursive: true });
   }
 
   async applyToJob(
     job: JobToApply,
     user: UserToApply,
-    options: ApplyEngineOptions = { dryRun: true, headless: true }
+    options: ApplyEngineOptions = { dryRun: true, headless: true },
   ): Promise<ApplyResult> {
     this.ensureDirectories();
 
@@ -75,15 +82,19 @@ export class PlaywrightApplyEngine {
     // 1. SAFETY KILLSWITCH & DRY-RUN ENFORCEMENT
     // Dry-run selalu AKTIF secara default, kecuali jika opsi dryRun: false DAN ALLOW_LIVE_APPLY=true di .env
     const requestedLive = options.dryRun === false;
-    const envAllowsLive = process.env.ALLOW_LIVE_APPLY === 'true';
+    const envAllowsLive = config.app.allowLiveApply;
 
     let isDryRun = true;
     if (requestedLive) {
       if (envAllowsLive) {
         isDryRun = false;
       } else {
-        console.warn('⚠️ [SAFETY-KILLSWITCH] Permintaan submit live DITOLAK karena ALLOW_LIVE_APPLY != "true" di .env!');
-        console.warn('   Sistem secara otomatis mengalihkan ke mode aman (DRY-RUN).');
+        console.warn(
+          '⚠️ [SAFETY-KILLSWITCH] Permintaan submit live DITOLAK karena ALLOW_LIVE_APPLY != "true" di .env!',
+        );
+        console.warn(
+          "   Sistem secara otomatis mengalihkan ke mode aman (DRY-RUN).",
+        );
         isDryRun = true;
       }
     }
@@ -94,7 +105,9 @@ export class PlaywrightApplyEngine {
     // Jika opsi useTailoredResume aktif (default: true), buat CV PDF yang disesuaikan ATS secara on-the-fly
     if (options.useTailoredResume !== false) {
       try {
-        console.log(`[APPLY-ENGINE] 🤖 Menghasilkan dynamic ATS-tailored resume untuk: "${job.title}"...`);
+        console.log(
+          `[APPLY-ENGINE] 🤖 Menghasilkan dynamic ATS-tailored resume untuk: "${job.title}"...`,
+        );
         const tailoredData = await generateTailoredResumeData({
           candidateName: user.fullName,
           candidateEmail: user.email,
@@ -107,13 +120,18 @@ export class PlaywrightApplyEngine {
           githubUrl: user.githubUrl,
           jobTitle: job.title,
           companyName: job.companyName,
-          jobDescription: job.description
+          jobDescription: job.description,
         });
         const tailoredPdf = await renderResumeToPdf(tailoredData, job.id);
         effectiveResumePath = tailoredPdf.pdfRelativePath;
-        console.log(`[APPLY-ENGINE] ✅ ATS-tailored resume siap: ${effectiveResumePath} (${(tailoredPdf.fileSizeBytes / 1024).toFixed(1)} KB)`);
+        console.log(
+          `[APPLY-ENGINE] ✅ ATS-tailored resume siap: ${effectiveResumePath} (${(tailoredPdf.fileSizeBytes / 1024).toFixed(1)} KB)`,
+        );
       } catch (err: any) {
-        console.warn(`[APPLY-ENGINE] Peringatan: Gagal generate tailored resume, fallback ke resume statis:`, err.message);
+        console.warn(
+          `[APPLY-ENGINE] Peringatan: Gagal generate tailored resume, fallback ke resume statis:`,
+          err.message,
+        );
       }
     }
 
@@ -127,11 +145,11 @@ export class PlaywrightApplyEngine {
       if (!isDryRun) {
         throw new Error(
           `[VERIFIKASI CV GAGAL] Berkas resume (${effectiveResumePath}) berukuran ${resumeSize} bytes (minimal 10KB). ` +
-          `Ukuran berkas terlalu kecil atau belum lengkap. Harap perbarui berkas "${effectiveResumePath}" dengan PDF CV resmi Anda sebelum mengirim lamaran langsung.`
+            `Ukuran berkas terlalu kecil atau belum lengkap. Harap perbarui berkas "${effectiveResumePath}" dengan PDF CV resmi Anda sebelum mengirim lamaran langsung.`,
         );
       } else {
         console.warn(
-          `⚠️ [VERIFIKASI CV] Ukuran berkas resume (${resumeSize} bytes) < 10KB. Melanjutkan simulasi pengisian formulir.`
+          `⚠️ [VERIFIKASI CV] Ukuran berkas resume (${resumeSize} bytes) < 10KB. Melanjutkan simulasi pengisian formulir.`,
         );
       }
     }
@@ -142,34 +160,40 @@ export class PlaywrightApplyEngine {
       jobListingId: job.id,
       jobUrl: job.jobUrl,
       resumeUsed: effectiveResumePath,
-      fieldsFilled: 0
+      fieldsFilled: 0,
     };
 
     let browser: Browser | null = null;
     let context: BrowserContext | null = null;
 
-    console.log(`\n[APPLY-ENGINE] Memulai aplikasi untuk: "${job.title}" @ ${job.companyName}`);
-    console.log(`[APPLY-ENGINE] Mode: ${isDryRun ? 'DRY-RUN (Aman, Tanpa Submit Akhir)' : '🚨 LIVE (SUBMIT AKTIF)'}`);
+    console.log(
+      `\n[APPLY-ENGINE] Memulai aplikasi untuk: "${job.title}" @ ${job.companyName}`,
+    );
+    console.log(
+      `[APPLY-ENGINE] Mode: ${isDryRun ? "DRY-RUN (Aman, Tanpa Submit Akhir)" : "🚨 LIVE (SUBMIT AKTIF)"}`,
+    );
     console.log(`[APPLY-ENGINE] Pelamar: ${user.fullName} (${user.email})`);
-    console.log(`[APPLY-ENGINE] Resume : ${effectiveResumePath} (${(resumeSize / 1024).toFixed(1)} KB)`);
+    console.log(
+      `[APPLY-ENGINE] Resume : ${effectiveResumePath} (${(resumeSize / 1024).toFixed(1)} KB)`,
+    );
 
     try {
       browser = await chromium.launch({
         headless: options.headless !== false,
         args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-gpu',
-          '--disable-blink-features=AutomationControlled'
-        ]
+          "--no-sandbox",
+          "--disable-setuid-sandbox",
+          "--disable-dev-shm-usage",
+          "--disable-gpu",
+          "--disable-blink-features=AutomationControlled",
+        ],
       });
 
       context = await browser.newContext({
         userAgent:
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         viewport: { width: 1280, height: 800 },
-        locale: 'id-ID'
+        locale: "id-ID",
       });
 
       const page = await context.newPage();
@@ -181,19 +205,27 @@ export class PlaywrightApplyEngine {
 
       // Navigasi ke URL lowongan
       console.log(`[APPLY-ENGINE] Navigasi ke: ${job.jobUrl}`);
-      await page.goto(job.jobUrl, { waitUntil: 'domcontentloaded', timeout: 45000 });
+      await page.goto(job.jobUrl, {
+        waitUntil: "domcontentloaded",
+        timeout: 45000,
+      });
       await page.waitForTimeout(2000);
 
       // Deteksi dini Bot Barrier / CAPTCHA (Cloudflare Turnstile, reCAPTCHA, hCaptcha, Arkose)
       const captchaChallenge = await page.$(
-        'iframe[src*="cloudflare"], iframe[src*="recaptcha"], iframe[src*="turnstile"], iframe[src*="hcaptcha"], div[class*="cf-turnstile"], div[id*="recaptcha"], div[class*="g-recaptcha"]'
+        'iframe[src*="cloudflare"], iframe[src*="recaptcha"], iframe[src*="turnstile"], iframe[src*="hcaptcha"], div[class*="cf-turnstile"], div[id*="recaptcha"], div[class*="g-recaptcha"]',
       );
       if (captchaChallenge) {
-        const isChallengeVisible = await captchaChallenge.isVisible().catch(() => false);
+        const isChallengeVisible = await captchaChallenge
+          .isVisible()
+          .catch(() => false);
         if (isChallengeVisible) {
-          console.warn('⚠️ [HITL-ALERT] Bot Challenge / CAPTCHA terdeteksi di portal lowongan!');
+          console.warn(
+            "⚠️ [HITL-ALERT] Bot Challenge / CAPTCHA terdeteksi di portal lowongan!",
+          );
           result.hitlRequired = true;
-          result.details = 'Bot Challenge / CAPTCHA terdeteksi. Memerlukan intervensi Human-in-The-Loop.';
+          result.details =
+            "Bot Challenge / CAPTCHA terdeteksi. Memerlukan intervensi Human-in-The-Loop.";
         }
       }
 
@@ -204,23 +236,29 @@ export class PlaywrightApplyEngine {
         'button:has-text("Lamar")',
         'a:has-text("Lamar")',
         'button:has-text("Apply for job")',
-        'a:has-text("Apply for job")'
-      ].join(', ');
+        'a:has-text("Apply for job")',
+      ].join(", ");
 
       const applyButton = await page.$(applyButtonSelector);
       if (applyButton) {
         const isVisible = await applyButton.isVisible().catch(() => false);
         if (isVisible) {
           const buttonText = await applyButton.textContent();
-          console.log(`[APPLY-ENGINE] Menemukan tombol pemicu aplikasi: "${buttonText?.trim()}". Mengklik...`);
+          console.log(
+            `[APPLY-ENGINE] Menemukan tombol pemicu aplikasi: "${buttonText?.trim()}". Mengklik...`,
+          );
 
           // Cek jika link eksternal
-          const href = await applyButton.getAttribute('href');
-          if (href && (href.startsWith('http') || href.startsWith('/'))) {
-            const targetUrl = href.startsWith('http') ? href : new URL(href, page.url()).toString();
+          const href = await applyButton.getAttribute("href");
+          if (href && (href.startsWith("http") || href.startsWith("/"))) {
+            const targetUrl = href.startsWith("http")
+              ? href
+              : new URL(href, page.url()).toString();
             // Jika link mengarah ke auth/login platform, tangani secara graceful
-            if (targetUrl.includes('/auth') || targetUrl.includes('/login')) {
-              console.log(`[APPLY-ENGINE] Peringatan: Halaman pelamaran membutuhkan otentikasi/login platform (${targetUrl}).`);
+            if (targetUrl.includes("/auth") || targetUrl.includes("/login")) {
+              console.log(
+                `[APPLY-ENGINE] Peringatan: Halaman pelamaran membutuhkan otentikasi/login platform (${targetUrl}).`,
+              );
             }
           }
 
@@ -234,63 +272,85 @@ export class PlaywrightApplyEngine {
       let currentStep = 1;
 
       while (currentStep <= MAX_FORM_STEPS) {
-        console.log(`\n[APPLY-ENGINE] --- Memproses Form Langkah ${currentStep} ---`);
+        console.log(
+          `\n[APPLY-ENGINE] --- Memproses Form Langkah ${currentStep} ---`,
+        );
 
         // A. Upload File Resume jika ada di langkah ini
-        const resolvedResumePath = path.resolve(process.cwd(), effectiveResumePath);
+        const resolvedResumePath = path.resolve(
+          process.cwd(),
+          effectiveResumePath,
+        );
         const fileInputs = await page.$$('input[type="file"]');
         if (fileInputs.length > 0 && fs.existsSync(resolvedResumePath)) {
-          console.log(`[APPLY-ENGINE] Mengunggah file resume (${effectiveResumePath})...`);
+          console.log(
+            `[APPLY-ENGINE] Mengunggah file resume (${effectiveResumePath})...`,
+          );
           for (const fileInput of fileInputs) {
             const isVis = await fileInput.isVisible().catch(() => true);
             if (isVis) {
               await fileInput.setInputFiles(resolvedResumePath).catch(() => {});
               result.fieldsFilled++;
-              console.log('  -> ✅ File resume berhasil diinjeksi ke input file.');
+              console.log(
+                "  -> ✅ File resume berhasil diinjeksi ke input file.",
+              );
             }
           }
         }
 
         // B. Deteksi form inputs pada langkah aktif
-        const formInputs = await page.$$('input:not([type="hidden"]), textarea, select');
-        console.log(`[APPLY-ENGINE] Terdeteksi ${formInputs.length} elemen input/textarea/select pada langkah ${currentStep}.`);
+        const formInputs = await page.$$(
+          'input:not([type="hidden"]), textarea, select',
+        );
+        console.log(
+          `[APPLY-ENGINE] Terdeteksi ${formInputs.length} elemen input/textarea/select pada langkah ${currentStep}.`,
+        );
 
         for (const inputEl of formInputs) {
           const isVisible = await inputEl.isVisible().catch(() => false);
           if (!isVisible) continue;
 
-          const tagName = await inputEl.evaluate((el) => el.tagName.toLowerCase());
-          const inputType = await inputEl.getAttribute('type') || (tagName === 'textarea' ? 'textarea' : 'text');
+          const tagName = await inputEl.evaluate((el) =>
+            el.tagName.toLowerCase(),
+          );
+          const inputType =
+            (await inputEl.getAttribute("type")) ||
+            (tagName === "textarea" ? "textarea" : "text");
 
-          if (inputType === 'file' || inputType === 'submit' || inputType === 'button') continue;
+          if (
+            inputType === "file" ||
+            inputType === "submit" ||
+            inputType === "button"
+          )
+            continue;
 
           // Ekstraksi info field, label, computed style, dan koordinat bounding box
           const fieldInfo: FieldElementInfo = await inputEl.evaluate((el) => {
             const id = el.id;
-            const name = el.getAttribute('name') || '';
-            const placeholder = el.getAttribute('placeholder') || '';
-            const ariaLabel = el.getAttribute('aria-label') || '';
-            const autocomplete = el.getAttribute('autocomplete') || '';
-            const role = el.getAttribute('role') || '';
-            const tabindex = el.getAttribute('tabindex') || '';
+            const name = el.getAttribute("name") || "";
+            const placeholder = el.getAttribute("placeholder") || "";
+            const ariaLabel = el.getAttribute("aria-label") || "";
+            const autocomplete = el.getAttribute("autocomplete") || "";
+            const role = el.getAttribute("role") || "";
+            const tabindex = el.getAttribute("tabindex") || "";
 
             const style = window.getComputedStyle(el);
             const rect = el.getBoundingClientRect();
             const isOffscreen = rect.left < -50 || rect.top < -50;
 
-            let labelText = '';
+            let labelText = "";
             if (id) {
               const labelEl = document.querySelector(`label[for="${id}"]`);
-              if (labelEl) labelText = labelEl.textContent || '';
+              if (labelEl) labelText = labelEl.textContent || "";
             }
             if (!labelText) {
-              const closestLabel = el.closest('label');
-              if (closestLabel) labelText = closestLabel.textContent || '';
+              const closestLabel = el.closest("label");
+              if (closestLabel) labelText = closestLabel.textContent || "";
             }
 
             return {
               tag: el.tagName,
-              type: (el as HTMLInputElement).type || '',
+              type: (el as HTMLInputElement).type || "",
               name,
               id,
               placeholder,
@@ -304,27 +364,35 @@ export class PlaywrightApplyEngine {
               computedVisibility: style.visibility,
               computedOpacity: style.opacity,
               width: rect.width,
-              height: rect.height
+              height: rect.height,
             };
           });
 
           // 🛡️ ANTI-BOT HONEYPOT DEFENSE: Abaikan field jebakan jika terdeteksi
           if (isHoneypotField(fieldInfo)) {
-            console.log(`  -> 🛡️ [ANTI-BOT] Mengabaikan Honeypot Trap field: "${fieldInfo.name || fieldInfo.id || 'decoy'}"`);
+            console.log(
+              `  -> 🛡️ [ANTI-BOT] Mengabaikan Honeypot Trap field: "${fieldInfo.name || fieldInfo.id || "decoy"}"`,
+            );
             continue;
           }
 
           const standardType = identifyFieldType(fieldInfo);
-          if (standardType === 'HONEYPOT_TRAP') {
-            console.log(`  -> 🛡️ [ANTI-BOT] Mengabaikan Honeypot Trap field (StandardType match)`);
+          if (standardType === "HONEYPOT_TRAP") {
+            console.log(
+              `  -> 🛡️ [ANTI-BOT] Mengabaikan Honeypot Trap field (StandardType match)`,
+            );
             continue;
           }
 
           // Jika cocok dengan field standar biodata
-          if (standardType !== 'UNKNOWN') {
+          if (standardType !== "UNKNOWN") {
             const value = getStandardFieldValue(standardType, user);
             if (value) {
-              const selector = fieldInfo.id ? `#${fieldInfo.id}` : (fieldInfo.name ? `[name="${fieldInfo.name}"]` : null);
+              const selector = fieldInfo.id
+                ? `#${fieldInfo.id}`
+                : fieldInfo.name
+                  ? `[name="${fieldInfo.name}"]`
+                  : null;
               if (selector) {
                 await humanTypeIntoField(page, selector, value);
                 result.fieldsFilled++;
@@ -333,14 +401,20 @@ export class PlaywrightApplyEngine {
             }
           } else {
             // Field Kuesioner / Pertanyaan Screening Kustom -> Selesaikan via AI Persona
-            const questionText = fieldInfo.labelText || fieldInfo.placeholder || fieldInfo.ariaLabel || fieldInfo.name;
+            const questionText =
+              fieldInfo.labelText ||
+              fieldInfo.placeholder ||
+              fieldInfo.ariaLabel ||
+              fieldInfo.name;
             if (questionText && questionText.length > 3) {
-              console.log(`  -> 🤖 Menyelesaikan pertanyaan screening AI: "${questionText}"...`);
+              console.log(
+                `  -> 🤖 Menyelesaikan pertanyaan screening AI: "${questionText}"...`,
+              );
 
               let optionsList: string[] = [];
-              if (tagName === 'select') {
-                optionsList = await inputEl.$$eval('option', (opts) =>
-                  opts.map((o) => o.textContent?.trim() || '').filter(Boolean)
+              if (tagName === "select") {
+                optionsList = await inputEl.$$eval("option", (opts) =>
+                  opts.map((o) => o.textContent?.trim() || "").filter(Boolean),
                 );
               }
 
@@ -352,7 +426,7 @@ export class PlaywrightApplyEngine {
                 jobContext: {
                   title: job.title,
                   companyName: job.companyName,
-                  description: job.description
+                  description: job.description,
                 },
                 user: {
                   fullName: user.fullName,
@@ -362,14 +436,20 @@ export class PlaywrightApplyEngine {
                   portfolioUrl: user.portfolioUrl,
                   githubUrl: user.githubUrl,
                   linkedInUrl: user.linkedInUrl,
-                  expectedSalary: user.expectedSalary
-                }
+                  expectedSalary: user.expectedSalary,
+                },
               });
 
-              const selector = fieldInfo.id ? `#${fieldInfo.id}` : (fieldInfo.name ? `[name="${fieldInfo.name}"]` : null);
+              const selector = fieldInfo.id
+                ? `#${fieldInfo.id}`
+                : fieldInfo.name
+                  ? `[name="${fieldInfo.name}"]`
+                  : null;
               if (selector) {
-                if (tagName === 'select') {
-                  await inputEl.selectOption({ label: aiAnswer }).catch(() => inputEl.selectOption({ index: 1 }));
+                if (tagName === "select") {
+                  await inputEl
+                    .selectOption({ label: aiAnswer })
+                    .catch(() => inputEl.selectOption({ index: 1 }));
                 } else {
                   await humanTypeIntoField(page, selector, aiAnswer);
                 }
@@ -387,16 +467,23 @@ export class PlaywrightApplyEngine {
             const isComboVisible = await combo.isVisible().catch(() => false);
             if (!isComboVisible) continue;
 
-            const comboLabel = (await combo.getAttribute('aria-label')) || (await combo.textContent()) || '';
-            if (comboLabel && !comboLabel.includes('Terpilih')) {
-              console.log(`  -> 🎯 Menangani Modern ATS Combobox: "${comboLabel.trim().slice(0, 40)}"`);
+            const comboLabel =
+              (await combo.getAttribute("aria-label")) ||
+              (await combo.textContent()) ||
+              "";
+            if (comboLabel && !comboLabel.includes("Terpilih")) {
+              console.log(
+                `  -> 🎯 Menangani Modern ATS Combobox: "${comboLabel.trim().slice(0, 40)}"`,
+              );
               await combo.click().catch(() => {});
               await page.waitForTimeout(500);
 
               // Cari opsi pertama yang valid di popup listbox
-              const firstOption = await page.$('[role="option"]:not([aria-disabled="true"])');
+              const firstOption = await page.$(
+                '[role="option"]:not([aria-disabled="true"])',
+              );
               if (firstOption) {
-                const optText = (await firstOption.textContent())?.trim() || '';
+                const optText = (await firstOption.textContent())?.trim() || "";
                 await firstOption.click().catch(() => {});
                 result.fieldsFilled++;
                 console.log(`     -> Opsi terpilih: "${optText}"`);
@@ -416,21 +503,29 @@ export class PlaywrightApplyEngine {
           'button:has-text("Save & Continue")',
           'button:has-text("Step ")',
           'a:has-text("Next")',
-          'a:has-text("Lanjut")'
-        ].join(', ');
+          'a:has-text("Lanjut")',
+        ].join(", ");
 
         const nextButton = await page.$(nextButtonSelector);
         let navigatedToNextStep = false;
 
         if (nextButton) {
           const isNextVisible = await nextButton.isVisible().catch(() => false);
-          const nextText = (await nextButton.textContent().catch(() => ''))?.trim().toLowerCase() || '';
+          const nextText =
+            (await nextButton.textContent().catch(() => ""))
+              ?.trim()
+              .toLowerCase() || "";
 
           // Pastikan bukan tombol submit akhir
-          const isFinalSubmit = nextText.includes('submit') || nextText.includes('kirim') || nextText.includes('apply');
+          const isFinalSubmit =
+            nextText.includes("submit") ||
+            nextText.includes("kirim") ||
+            nextText.includes("apply");
 
           if (isNextVisible && !isFinalSubmit) {
-            console.log(`[APPLY-ENGINE] Menemukan tombol langkah berikutnya: "${nextText}". Menavigasi...`);
+            console.log(
+              `[APPLY-ENGINE] Menemukan tombol langkah berikutnya: "${nextText}". Menavigasi...`,
+            );
             await nextButton.click().catch(() => {});
             await page.waitForTimeout(3000);
             navigatedToNextStep = true;
@@ -438,7 +533,9 @@ export class PlaywrightApplyEngine {
         }
 
         if (!navigatedToNextStep) {
-          console.log('[APPLY-ENGINE] Tidak ada langkah bertahap berikutnya. Telah mencapai langkah formulir akhir.');
+          console.log(
+            "[APPLY-ENGINE] Tidak ada langkah bertahap berikutnya. Telah mencapai langkah formulir akhir.",
+          );
           break;
         }
 
@@ -446,39 +543,51 @@ export class PlaywrightApplyEngine {
       }
 
       // 5. Tangkap Bukti Screenshot (Terutama pada mode DRY-RUN atau saat terdeteksi tantangan HITL)
-      const screenshotPrefix = result.hitlRequired ? 'hitl-challenge' : (isDryRun ? 'dry-run' : 'applied');
+      const screenshotPrefix = result.hitlRequired
+        ? "hitl-challenge"
+        : isDryRun
+          ? "dry-run"
+          : "applied";
       const screenshotFilename = `${screenshotPrefix}-${job.id}-${timestamp}.png`;
       const screenshotRelativePath = `logs/screenshots/${screenshotFilename}`;
-      const screenshotFullPath = path.resolve(process.cwd(), screenshotRelativePath);
+      const screenshotFullPath = path.resolve(
+        process.cwd(),
+        screenshotRelativePath,
+      );
 
       await page.screenshot({ path: screenshotFullPath, fullPage: true });
       result.screenshotPath = screenshotRelativePath;
-      console.log(`[APPLY-ENGINE] Screenshot bukti form disimpan ke: ${screenshotRelativePath}`);
+      console.log(
+        `[APPLY-ENGINE] Screenshot bukti form disimpan ke: ${screenshotRelativePath}`,
+      );
 
       // 6. Submit Akhir (Hanya jika BUKAN mode Dry-Run dan Lolos Safety Killswitch)
       if (!isDryRun) {
-        console.log('[APPLY-ENGINE] Melakukan submit akhir...');
+        console.log("[APPLY-ENGINE] Melakukan submit akhir...");
         const submitButtonSelector = [
           'button[type="submit"]',
           'input[type="submit"]',
           'button:has-text("Submit")',
           'button:has-text("Kirim Lamaran")',
-          'button:has-text("Submit Application")'
-        ].join(', ');
+          'button:has-text("Submit Application")',
+        ].join(", ");
 
         const submitBtn = await page.$(submitButtonSelector);
         if (submitBtn) {
           await submitBtn.click();
           await page.waitForTimeout(5000);
-          console.log('[APPLY-ENGINE] ✅ Form berhasil di-submit.');
+          console.log("[APPLY-ENGINE] ✅ Form berhasil di-submit.");
           result.appliedAt = new Date();
           result.success = true;
         } else {
-          result.details = 'Form terisi namun tombol submit akhir tidak ditemukan.';
+          result.details =
+            "Form terisi namun tombol submit akhir tidak ditemukan.";
           result.success = true; // Dianggap berhasil mengisi
         }
       } else {
-        console.log('[APPLY-ENGINE] 🛑 MODE DRY-RUN: Berhenti sebelum klik submit akhir.');
+        console.log(
+          "[APPLY-ENGINE] 🛑 MODE DRY-RUN: Berhenti sebelum klik submit akhir.",
+        );
         result.success = true;
         result.details = `Dry-run berhasil mengisi ${result.fieldsFilled} field dan mengunggah CV.`;
       }
@@ -492,7 +601,11 @@ export class PlaywrightApplyEngine {
       if (context) {
         const pages = context.pages();
         if (pages.length > 0) {
-          await pages[0].screenshot({ path: path.resolve(process.cwd(), errorScreenshotPath) }).catch(() => {});
+          await pages[0]
+            .screenshot({
+              path: path.resolve(process.cwd(), errorScreenshotPath),
+            })
+            .catch(() => {});
         }
       }
 
@@ -506,14 +619,20 @@ export class PlaywrightApplyEngine {
         try {
           await context.close();
         } catch (closeContextErr: any) {
-          console.warn('[APPLY-ENGINE] Peringatan saat menutup BrowserContext:', closeContextErr?.message);
+          console.warn(
+            "[APPLY-ENGINE] Peringatan saat menutup BrowserContext:",
+            closeContextErr?.message,
+          );
         }
       }
       if (browser) {
         try {
           await browser.close();
         } catch (closeBrowserErr: any) {
-          console.warn('[APPLY-ENGINE] Peringatan saat menutup Browser:', closeBrowserErr?.message);
+          console.warn(
+            "[APPLY-ENGINE] Peringatan saat menutup Browser:",
+            closeBrowserErr?.message,
+          );
         }
       }
     }

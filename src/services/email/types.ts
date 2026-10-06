@@ -1,3 +1,4 @@
+import { config } from "../../config/env";
 export interface CoverLetterParams {
   candidateName: string;
   candidateEmail: string;
@@ -34,7 +35,7 @@ export interface EmailDispatchParams {
 export interface EmailDispatchResult {
   success: boolean;
   messageId?: string;
-  mode: 'DRY_RUN' | 'LIVE_SEND';
+  mode: "DRY_RUN" | "LIVE_SEND";
   to: string;
   subject: string;
   sentAt: string;

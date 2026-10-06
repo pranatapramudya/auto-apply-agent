@@ -1,47 +1,48 @@
-import prisma from '../../lib/prisma';
-import { RawSocialPost, SocialPlatform, ExtractedSocialJob } from './types';
-import { extractJobFromSocialPost } from './social-post-extractor';
+import { config } from "../../config/env";
+import prisma from "../../lib/prisma";
+import { RawSocialPost, SocialPlatform, ExtractedSocialJob } from "./types";
+import { extractJobFromSocialPost } from "./social-post-extractor";
 
 /**
  * Daftar Akun Resmi & Terverifikasi Info Loker Sumedang & Bandung
  */
 export const VERIFIED_SOCIAL_SOURCES = [
   {
-    platform: 'INSTAGRAM' as SocialPlatform,
-    account: '@infolokersumedang',
-    name: 'Info Loker Sumedang Official',
-    locationFocus: 'Sumedang'
+    platform: "INSTAGRAM" as SocialPlatform,
+    account: "@infolokersumedang",
+    name: "Info Loker Sumedang Official",
+    locationFocus: "Sumedang",
   },
   {
-    platform: 'INSTAGRAM' as SocialPlatform,
-    account: '@disnakersumedang',
-    name: 'Disnakertrans Kab. Sumedang',
-    locationFocus: 'Sumedang'
+    platform: "INSTAGRAM" as SocialPlatform,
+    account: "@disnakersumedang",
+    name: "Disnakertrans Kab. Sumedang",
+    locationFocus: "Sumedang",
   },
   {
-    platform: 'INSTAGRAM' as SocialPlatform,
-    account: '@lokerbandung.id',
-    name: 'Info Loker Bandung Raya',
-    locationFocus: 'Bandung'
+    platform: "INSTAGRAM" as SocialPlatform,
+    account: "@lokerbandung.id",
+    name: "Info Loker Bandung Raya",
+    locationFocus: "Bandung",
   },
   {
-    platform: 'INSTAGRAM' as SocialPlatform,
-    account: '@disnakertransjabar',
-    name: 'Disnakertrans Provinsi Jawa Barat',
-    locationFocus: 'Jawa Barat'
+    platform: "INSTAGRAM" as SocialPlatform,
+    account: "@disnakertransjabar",
+    name: "Disnakertrans Provinsi Jawa Barat",
+    locationFocus: "Jawa Barat",
   },
   {
-    platform: 'TIKTOK' as SocialPlatform,
-    account: '@lokersumedang_terkini',
-    name: 'Loker Sumedang Terkini (TikTok)',
-    locationFocus: 'Sumedang'
+    platform: "TIKTOK" as SocialPlatform,
+    account: "@lokersumedang_terkini",
+    name: "Loker Sumedang Terkini (TikTok)",
+    locationFocus: "Sumedang",
   },
   {
-    platform: 'TIKTOK' as SocialPlatform,
-    account: '@infolokerbandung_resmi',
-    name: 'Info Loker Bandung (TikTok)',
-    locationFocus: 'Bandung'
-  }
+    platform: "TIKTOK" as SocialPlatform,
+    account: "@infolokerbandung_resmi",
+    name: "Info Loker Bandung (TikTok)",
+    locationFocus: "Bandung",
+  },
 ];
 
 /**
@@ -49,10 +50,10 @@ export const VERIFIED_SOCIAL_SOURCES = [
  */
 export const SAMPLE_OFFICIAL_SOCIAL_FEEDS: RawSocialPost[] = [
   {
-    id: 'ig-sumedang-01',
-    platform: 'INSTAGRAM',
-    sourceAccount: '@infolokersumedang',
-    postUrl: 'https://www.instagram.com/p/C8sumedang_tech01/',
+    id: "ig-sumedang-01",
+    platform: "INSTAGRAM",
+    sourceAccount: "@infolokersumedang",
+    postUrl: "https://www.instagram.com/p/C8sumedang_tech01/",
     caption: `[LOWONGAN KERJA RESMI SUMEDANG]
 PT Polyfin Canggih (Kawasan Industri Bandung - Sumedang) membuka lowongan untuk posisi:
 IT Infrastructure & Web Admin
@@ -69,13 +70,13 @@ Email HRD: recruitment@polyfin.com
 Subjek: Loker_IT_Admin_Sumedang
 Batas akhir pendaftaran: 30 September 2026.
 #lokersumedang #infolokersumedang #lokerbandung`,
-    postedAt: new Date().toISOString()
+    postedAt: new Date().toISOString(),
   },
   {
-    id: 'ig-sumedang-02',
-    platform: 'INSTAGRAM',
-    sourceAccount: '@disnakersumedang',
-    postUrl: 'https://www.instagram.com/p/C8disnaker_sumedang02/',
+    id: "ig-sumedang-02",
+    platform: "INSTAGRAM",
+    sourceAccount: "@disnakersumedang",
+    postUrl: "https://www.instagram.com/p/C8disnaker_sumedang02/",
     caption: `Pengumuman Rekrutmen Tenaga Pendukung Teknis & Administrasi Sistem
 Pemerintah Kabupaten Sumedang
 
@@ -90,13 +91,13 @@ Email: kerjakeras@sumedangkab.go.id
 Cc: bkd@sumedangkab.go.id
 Subjek: Lamaran_TenagaPendukung_Sumedang_2026
 GRATIS tanpa dipungut biaya apapun! Waspada penipuan mengatasnamakan Pemkab Sumedang.`,
-    postedAt: new Date().toISOString()
+    postedAt: new Date().toISOString(),
   },
   {
-    id: 'tiktok-bandung-01',
-    platform: 'TIKTOK',
-    sourceAccount: '@infolokerbandung_resmi',
-    postUrl: 'https://www.tiktok.com/@infolokerbandung_resmi/video/73928192019',
+    id: "tiktok-bandung-01",
+    platform: "TIKTOK",
+    sourceAccount: "@infolokerbandung_resmi",
+    postUrl: "https://www.tiktok.com/@infolokerbandung_resmi/video/73928192019",
     caption: `Info Loker Bandung Raya guys! Software House di Bandung lagi buka posisi Frontend Web Developer (Next.js & React)!
 Gaji 8 - 12 Juta/bulan, lokasi kerja di Antapani Bandung (bisa WFH 2 hari seminggu).
 Syarat:
@@ -106,8 +107,8 @@ Syarat:
 Kirim CV & Portofolio langsung ke email HRD: karir@kreatifkoding.id
 Subjek: Frontend_Bandung_Nama
 #lokerbandung #lokersumedang #frontend #programming`,
-    postedAt: new Date().toISOString()
-  }
+    postedAt: new Date().toISOString(),
+  },
 ];
 
 /**
@@ -117,18 +118,18 @@ export async function scrapeSocialMediaJobs(params: {
   userId: string;
   platform?: SocialPlatform;
   customCaptionOrUrl?: string;
-  locationFilter?: 'Sumedang' | 'Bandung' | 'Semua';
+  locationFilter?: "Sumedang" | "Bandung" | "Semua";
 }): Promise<{
   totalProcessed: number;
   inserted: number;
   jobs: ExtractedSocialJob[];
 }> {
   const user = await prisma.user.findUnique({
-    where: { id: params.userId }
+    where: { id: params.userId },
   });
 
   if (!user) {
-    throw new Error('User tidak ditemukan.');
+    throw new Error("User tidak ditemukan.");
   }
 
   const postsToProcess: RawSocialPost[] = [];
@@ -139,11 +140,13 @@ export async function scrapeSocialMediaJobs(params: {
     const isTiktok = /tiktok\.com/i.test(rawText);
     postsToProcess.push({
       id: `custom-${Date.now()}`,
-      platform: isTiktok ? 'TIKTOK' : 'INSTAGRAM',
-      sourceAccount: isTiktok ? '@tiktok_user' : '@instagram_user',
-      postUrl: rawText.startsWith('http') ? rawText : 'https://instagram.com/p/custom_share',
+      platform: isTiktok ? "TIKTOK" : "INSTAGRAM",
+      sourceAccount: isTiktok ? "@tiktok_user" : "@instagram_user",
+      postUrl: rawText.startsWith("http")
+        ? rawText
+        : "https://instagram.com/p/custom_share",
       caption: rawText,
-      postedAt: new Date().toISOString()
+      postedAt: new Date().toISOString(),
     });
   } else {
     // Gunakan curated feeds resmi Sumedang & Bandung
@@ -151,9 +154,9 @@ export async function scrapeSocialMediaJobs(params: {
     if (params.platform) {
       feeds = feeds.filter((f) => f.platform === params.platform);
     }
-    if (params.locationFilter && params.locationFilter !== 'Semua') {
+    if (params.locationFilter && params.locationFilter !== "Semua") {
       feeds = feeds.filter((f) =>
-        f.caption.toLowerCase().includes(params.locationFilter!.toLowerCase())
+        f.caption.toLowerCase().includes(params.locationFilter!.toLowerCase()),
       );
     }
     postsToProcess.push(...feeds);
@@ -163,12 +166,14 @@ export async function scrapeSocialMediaJobs(params: {
   let insertedCount = 0;
 
   for (const post of postsToProcess) {
-    console.log(`[SOCIAL-CRAWLER] Mengekstrak data dari ${post.platform} (${post.sourceAccount})...`);
+    console.log(
+      `[SOCIAL-CRAWLER] Mengekstrak data dari ${post.platform} (${post.sourceAccount})...`,
+    );
 
     const extracted = await extractJobFromSocialPost(post, {
       roles: user.targetRoles,
       skills: user.coreSkills,
-      city: user.city || 'Sumedang (Bandung Raya)'
+      city: user.city || "Sumedang (Bandung Raya)",
     });
 
     extractedList.push(extracted);
@@ -178,9 +183,9 @@ export async function scrapeSocialMediaJobs(params: {
       where: {
         userId_jobUrl: {
           userId: user.id,
-          jobUrl: post.postUrl
-        }
-      }
+          jobUrl: post.postUrl,
+        },
+      },
     });
 
     if (!existing) {
@@ -194,12 +199,12 @@ export async function scrapeSocialMediaJobs(params: {
           jobUrl: post.postUrl,
           location: extracted.location,
           salaryRange: extracted.salaryRange || null,
-          description: `${post.caption}\n\n--- KONTAK HRD RESMI ---\nEmail HRD: ${extracted.hrdEmail || 'Tidak tertera'}\nWhatsApp: ${extracted.hrdPhone || 'Tidak tertera'}`,
+          description: `${post.caption}\n\n--- KONTAK HRD RESMI ---\nEmail HRD: ${extracted.hrdEmail || "Tidak tertera"}\nWhatsApp: ${extracted.hrdPhone || "Tidak tertera"}`,
           isLegit: extracted.isLegitimate,
           scamReason: extracted.scamAnalysis,
           matchScore: extracted.matchScore,
-          status: extracted.isLegitimate ? 'DISCOVERED' : 'FILTERED_OUT'
-        }
+          status: extracted.isLegitimate ? "DISCOVERED" : "FILTERED_OUT",
+        },
       });
       insertedCount++;
     }
@@ -208,6 +213,6 @@ export async function scrapeSocialMediaJobs(params: {
   return {
     totalProcessed: postsToProcess.length,
     inserted: insertedCount,
-    jobs: extractedList
+    jobs: extractedList,
   };
 }
