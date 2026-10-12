@@ -39,7 +39,9 @@ function loadCandidateKnowledge(
       "candidate-knowledge.json",
     );
     if (fs.existsSync(filePath)) {
-      const parsed = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+      const parsed = JSON.parse(
+        fs.readFileSync(filePath, "utf-8").replace(/^\uFEFF/, ""),
+      );
       if (parsed.candidates) {
         const combined =
           `${candidateEmail || ""} ${candidateName || ""} ${targetRoles || ""}`.toLowerCase();
