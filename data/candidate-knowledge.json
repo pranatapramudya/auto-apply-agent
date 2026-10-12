@@ -1,14 +1,14 @@
-{
+﻿{
   "candidates": {
     "primary": {
       "id": "primary",
       "fullName": "Pranata Pramudya",
-      "email": "pranataprp@gmail.com",
-      "phone": "+62 812-3456-7890",
+      "email": "pranatapramudya39@gmail.com",
+      "phone": "+6281395053922",
       "city": "Sumedang / Bandung, Indonesia",
-      "linkedInUrl": "https://linkedin.com/in/pranataprp",
-      "githubUrl": "https://github.com/pranataprp",
-      "portfolioUrl": "https://pranata.dev",
+      "linkedInUrl": "https://www.linkedin.com/in/pranata-pramudya-2a4427292/",
+      "githubUrl": "https://github.com/pranatapramudya",
+      "portfolioUrl": "https://pranajayatech.online",
       "targetRoles": [
         "Full-stack Developer",
         "Next.js Developer",
@@ -29,7 +29,7 @@
         "Docker",
         "Git"
       ],
-      "professionalSummary": "Full-stack & AI Solutions Engineer berpengalaman dalam membangun arsitektur web performa tinggi menggunakan Next.js, TypeScript, PostgreSQL, dan Playwright. Ahli dalam merancang pipeline automasi cerdas, optimasi database berskala besar, serta integrasi Large Language Models (LLM) dengan pendekatan zero-hallucination.",
+      "professionalSummary": "Full-stack \u0026 AI Solutions Engineer berpengalaman dalam membangun arsitektur web performa tinggi menggunakan Next.js, TypeScript, PostgreSQL, dan Playwright. Ahli dalam merancang pipeline automasi cerdas, optimasi database berskala besar, serta integrasi Large Language Models (LLM) dengan pendekatan zero-hallucination.",
       "workExperience": [
         {
           "position": "Lead Full-stack Engineer",
@@ -49,7 +49,7 @@
           "period": "2021 - 2023",
           "location": "Jakarta / Hybrid",
           "bulletPoints": [
-            "Mengembangkan aplikasi web e-commerce dan dashboard internal berbasis Next.js, TypeScript, dan TailwindCSS melayani >50.000 pengguna aktif bulanan.",
+            "Mengembangkan aplikasi web e-commerce dan dashboard internal berbasis Next.js, TypeScript, dan TailwindCSS melayani \u003e50.000 pengguna aktif bulanan.",
             "Merancang skema database relational terdistribusi dengan PostgreSQL dan caching Redis, mengurangi beban server puncak hingga 30%.",
             "Mengotomatiskan pipeline CI/CD menggunakan GitHub Actions dan Docker, mempersingkat siklus deployment dari 40 menit menjadi 8 menit.",
             "Berkolaborasi erat dengan tim produk dan UI/UX untuk menghasilkan antarmuka responsif dan aksesibel sesuai standar WCAG AA."
@@ -93,27 +93,27 @@
         "Staff Administrasi Publik",
         "Document Controller",
         "General Affairs (GA)",
-        "Tata Kelola Dokumen & Kearsipan",
+        "Tata Kelola Dokumen \u0026 Kearsipan",
         "Government Relations Officer",
-        "Staff Administrasi Perkantoran & Sekretariat",
+        "Staff Administrasi Perkantoran \u0026 Sekretariat",
         "Staff Operasional Semua Jurusan"
       ],
       "coreSkills": [
         "Administrasi Perkantoran",
         "Manajemen Kearsipan Digital",
-        "Tata Naskah Dinas & Korespondensi",
+        "Tata Naskah Dinas \u0026 Korespondensi",
         "Microsoft Excel (Pivot Table, VLOOKUP, Data Validation)",
-        "Microsoft Word & Google Workspace",
+        "Microsoft Word \u0026 Google Workspace",
         "Standard Operating Procedure (SOP)",
         "Pelayanan Prima (Service Excellence)",
-        "Public Relations & Hubungan Antar Lembaga",
-        "Manajemen Inventaris & Logistik Kantor",
+        "Public Relations \u0026 Hubungan Antar Lembaga",
+        "Manajemen Inventaris \u0026 Logistik Kantor",
         "Administrasi Kepegawaian (HR Admin)"
       ],
       "professionalSummary": "Sarjana Administrasi Publik (S.AP) yang teliti, adaptif, dan berdedikasi tinggi dengan keahlian mendalam dalam tata kelola dokumen kedinasan, sistem kearsipan digital, penyusunan SOP birokrasi, serta administrasi operasional perkantoran. Berpengalaman dalam memproses lebih dari 1.200 berkas resmi per bulan dengan akurasi 99.8% dan efisiensi penataan arsip modern.",
       "workExperience": [
         {
-          "position": "Senior Administration & Document Controller",
+          "position": "Senior Administration \u0026 Document Controller",
           "company": "PT Graha Mitra Administrasi",
           "period": "2022 - Sekarang",
           "location": "Bandung / Jakarta",
@@ -125,8 +125,8 @@
           ]
         },
         {
-          "position": "Staf Administrasi Umum & Pelayanan Publik",
-          "company": "Biro Layanan Terpadu & Kesekretariatan",
+          "position": "Staf Administrasi Umum \u0026 Pelayanan Publik",
+          "company": "Biro Layanan Terpadu \u0026 Kesekretariatan",
           "period": "2020 - 2022",
           "location": "Jawa Barat",
           "bulletPoints": [
@@ -138,7 +138,7 @@
       ],
       "projects": [
         {
-          "name": "Digitalisasi & Modernisasi Tata Kelola Kearsipan",
+          "name": "Digitalisasi \u0026 Modernisasi Tata Kelola Kearsipan",
           "technologies": "Sistem Informasi Kearsipan, Google Drive for Enterprise, Microsoft Excel Database",
           "description": "Transformasi pengarsipan berkas konvensional ke repositori digital berbasis cloud dengan skema penomoran terindeks otomatis."
         },
@@ -156,8 +156,8 @@
         }
       ],
       "certifications": [
-        "Sertifikasi Pengelolaan Kearsipan & Tata Naskah Dinas",
-        "Sertifikasi Microsoft Office Specialist (Excel & Word)"
+        "Sertifikasi Pengelolaan Kearsipan \u0026 Tata Naskah Dinas",
+        "Sertifikasi Microsoft Office Specialist (Excel \u0026 Word)"
       ]
     }
   }

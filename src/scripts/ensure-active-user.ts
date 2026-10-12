@@ -1,4 +1,5 @@
 import prisma from "../lib/prisma";
+import { config } from "../config/env";
 
 async function main() {
   // Pastikan Siti Fathonah non-aktif
@@ -16,7 +17,7 @@ async function main() {
     },
   });
 
-  // Pastikan Pranata Pramudya aktif
+  // Pastikan Pranata Pramudya aktif dengan data terbaru dari config
   await prisma.user.updateMany({
     where: {
       OR: [
@@ -25,7 +26,13 @@ async function main() {
       ],
     },
     data: {
-      fullName: "Pranata Pramudya",
+      fullName: config.applicant.fullName,
+      email: config.applicant.email,
+      phone: config.applicant.phone,
+      city: config.applicant.city,
+      linkedInUrl: config.applicant.linkedInUrl,
+      githubUrl: config.applicant.githubUrl,
+      portfolioUrl: config.applicant.portfolioUrl,
       isActive: true,
       resumeLocalPath: "./assets/resume-primary.pdf",
     },
@@ -35,18 +42,23 @@ async function main() {
   console.log(
     "================================================================",
   );
-  console.log("STATUS PROFIL DATABASE:");
+  console.log("DATA USER PROFILE TERKINI DI DATABASE:");
   console.log(
     "================================================================",
   );
   for (const u of users) {
     const jobCount = await prisma.jobListing.count({ where: { userId: u.id } });
     console.log(
-      `- [${u.isActive ? "AKTIF" : "NON-AKTIF (OFF)"}] ${u.fullName} (${u.email})`,
+      `- [${u.isActive ? "AKTIF" : "NON-AKTIF (OFF)"}] ${u.fullName}`,
     );
-    console.log(`  ID: ${u.id}`);
-    console.log(`  Resume: ${u.resumeLocalPath}`);
-    console.log(`  Total Lowongan Terdaftar: ${jobCount}`);
+    console.log(`  ID         : ${u.id}`);
+    console.log(`  Email      : ${u.email}`);
+    console.log(`  Phone / WA : ${u.phone}`);
+    console.log(`  GitHub     : ${u.githubUrl}`);
+    console.log(`  LinkedIn   : ${u.linkedInUrl}`);
+    console.log(`  Portfolio  : ${u.portfolioUrl}`);
+    console.log(`  Resume     : ${u.resumeLocalPath}`);
+    console.log(`  Total Loker: ${jobCount}`);
     console.log("");
   }
 }
