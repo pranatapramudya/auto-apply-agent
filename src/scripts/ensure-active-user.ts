@@ -17,7 +17,7 @@ async function main() {
     },
   });
 
-  // Pastikan Pranata Pramudya aktif dengan data terbaru dari config
+  // Pastikan Pranata Pramudya aktif dengan data 100% REAL dari CV resmi
   await prisma.user.updateMany({
     where: {
       OR: [
@@ -26,13 +26,17 @@ async function main() {
       ],
     },
     data: {
-      fullName: config.applicant.fullName,
-      email: config.applicant.email,
-      phone: config.applicant.phone,
-      city: config.applicant.city,
-      linkedInUrl: config.applicant.linkedInUrl,
-      githubUrl: config.applicant.githubUrl,
-      portfolioUrl: config.applicant.portfolioUrl,
+      fullName: "Pranata Pramudya",
+      email: "pranatapramudya39@gmail.com",
+      phone: "+6281395053922",
+      city: "Sumedang, Jawa Barat, Indonesia",
+      linkedInUrl: "https://www.linkedin.com/in/pranata-pramudya-2a4427292/",
+      githubUrl: "https://github.com/pranatapramudya",
+      portfolioUrl: "https://portofolio-pranata-pramudya.vercel.app",
+      targetRoles:
+        "Systems Architect & Process Optimization Specialist, Full Stack Developer, Next.js Developer, Backend Developer, Software Engineer",
+      coreSkills:
+        "Next.js 14, TypeScript, React, Prisma ORM, PostgreSQL, Supabase, Capacitor, Midtrans API, Clerk Auth, Tailwind CSS, Google Cloud Foundations, Applied Microsoft Office",
       isActive: true,
       resumeLocalPath: "./assets/resume-primary.pdf",
     },
@@ -42,7 +46,7 @@ async function main() {
   console.log(
     "================================================================",
   );
-  console.log("DATA USER PROFILE TERKINI DI DATABASE:");
+  console.log("DATA USER PROFILE TERKINI DI DATABASE (VERIFIKASI 100% ASLI):");
   console.log(
     "================================================================",
   );
@@ -54,10 +58,13 @@ async function main() {
     console.log(`  ID         : ${u.id}`);
     console.log(`  Email      : ${u.email}`);
     console.log(`  Phone / WA : ${u.phone}`);
+    console.log(`  Domisili   : ${u.city}`);
     console.log(`  GitHub     : ${u.githubUrl}`);
-    console.log(`  LinkedIn   : ${u.linkedInUrl}`);
     console.log(`  Portfolio  : ${u.portfolioUrl}`);
-    console.log(`  Resume     : ${u.resumeLocalPath}`);
+    console.log(`  LinkedIn   : ${u.linkedInUrl}`);
+    console.log(`  Target Role: ${u.targetRoles}`);
+    console.log(`  Skills     : ${u.coreSkills}`);
+    console.log(`  CV Asli    : ${u.resumeLocalPath}`);
     console.log(`  Total Loker: ${jobCount}`);
     console.log("");
   }

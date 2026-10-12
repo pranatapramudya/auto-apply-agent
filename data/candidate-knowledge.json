@@ -3,81 +3,107 @@
     "primary": {
       "id": "primary",
       "fullName": "Pranata Pramudya",
+      "title": "S.Kom | Systems Architect & Process Optimization Specialist",
       "email": "pranatapramudya39@gmail.com",
       "phone": "+6281395053922",
-      "city": "Sumedang / Bandung, Indonesia",
+      "city": "Sumedang, Jawa Barat, Indonesia",
       "linkedInUrl": "https://www.linkedin.com/in/pranata-pramudya-2a4427292/",
       "githubUrl": "https://github.com/pranatapramudya",
-      "portfolioUrl": "https://pranajayatech.online",
+      "portfolioUrl": "https://portofolio-pranata-pramudya.vercel.app",
       "targetRoles": [
-        "Full-stack Developer",
+        "Systems Architect & Process Optimization Specialist",
+        "Full Stack Developer",
         "Next.js Developer",
-        "Backend Engineer",
-        "AI Solutions Engineer"
+        "Backend Developer",
+        "Software Engineer"
       ],
       "coreSkills": [
+        "Next.js 14",
         "TypeScript",
-        "Next.js",
         "React",
         "Node.js",
-        "PostgreSQL",
         "Prisma ORM",
-        "Python",
-        "Playwright",
-        "TailwindCSS",
-        "RESTful APIs",
-        "Docker",
-        "Git"
+        "PostgreSQL",
+        "Supabase",
+        "Capacitor (Android APK)",
+        "Midtrans API",
+        "Clerk Auth",
+        "Tailwind CSS",
+        "Google Cloud Foundations",
+        "Applied Microsoft Office (Excel, Word, PowerPoint)",
+        "Analisis Data & Efisiensi Proses",
+        "Workflow Management"
       ],
-      "professionalSummary": "Full-stack & AI Solutions Engineer berpengalaman dalam membangun arsitektur web performa tinggi menggunakan Next.js, TypeScript, PostgreSQL, dan Playwright. Ahli dalam merancang pipeline automasi cerdas, optimasi database berskala besar, serta integrasi Large Language Models (LLM) dengan pendekatan zero-hallucination.",
+      "professionalSummary": "Lulusan S.Kom yang berfokus pada perancangan arsitektur sistem, pengembangan aplikasi web/mobile, dan optimalisasi alur kerja digital. Memiliki rekam jejak dalam mentransformasi proses manual yang kompleks menjadi sistem otomatis yang efisien, terbukti dengan keberhasilan memangkas waktu operasional hingga 66% melalui pendekatan User-Centered Design. Ahli dalam menyusun logika integrasi data riil (API) dan membangun infrastruktur aplikasi modern yang skalabel. Memadukan ketelitian administrasi dengan pemikiran arsitektural untuk menciptakan solusi teknologi yang tepat guna.",
       "workExperience": [
         {
-          "position": "Lead Full-stack Engineer",
-          "company": "Digital Inovasi Solusindo",
-          "period": "2023 - Sekarang",
-          "location": "Bandung / Remote",
+          "position": "Full Stack Developer",
+          "company": "KKF Label (Premium E-Commerce SaaS)",
+          "period": "2024 - Sekarang",
+          "location": "Sumedang / Remote",
           "bulletPoints": [
-            "Merancang dan memelihara microservices berbasis Node.js dan Next.js dengan arsitektur serverless, meningkatkan throughput API hingga 45%.",
-            "Mengimplementasikan pipeline automasi browser cerdas dengan Playwright dan AI LLM, menghemat lebih dari 120 jam operasional manual per bulan.",
-            "Memimpin optimasi query PostgreSQL dan Prisma ORM, memangkas latensi respon database rata-rata dari 420ms menjadi 85ms.",
-            "Membangun dashboard analitik SaaS modern berbasis React 19, TailwindCSS, dan server-sent events dengan uptime 99.9%."
+            "End-to-End Development: Merancang dan membangun platform e-commerce secara mandiri dari tahap konsep hingga tahap produksi menggunakan Next.js 14, TypeScript, dan Tailwind CSS.",
+            "Payment & Transaction: Mengintegrasikan Midtrans API secara penuh untuk memproses transaksi pembayaran instan melalui QRIS dan dompet digital (e-wallet).",
+            "Database & Backend System: Mengelola skema arsitektur data dan backend menggunakan Prisma ORM serta Supabase (PostgreSQL) untuk fitur manajemen inventaris (CRUD), varian produk, dan pengelolaan storage media.",
+            "Security & Auth: Mengimplementasikan keamanan sistem tingkat enterprise menggunakan Clerk untuk melindungi rute sensitif pada dashboard administrator.",
+            "Cross-Platform: Mengembangkan antarmuka mobile-first yang responsif dan mengonversi aplikasi web menjadi aplikasi mobile Android (APK) menggunakan Capacitor."
           ]
         },
         {
-          "position": "Software Engineer (Full-stack)",
-          "company": "Kreatif Solusi Mandiri",
-          "period": "2021 - 2023",
-          "location": "Jakarta / Hybrid",
+          "position": "Architect & Developer",
+          "company": "Enterprise Medical SaaS (White-Label Implementation)",
+          "period": "2024 - 2025",
+          "location": "Sumedang / Hybrid",
           "bulletPoints": [
-            "Mengembangkan aplikasi web e-commerce dan dashboard internal berbasis Next.js, TypeScript, dan TailwindCSS melayani >50.000 pengguna aktif bulanan.",
-            "Merancang skema database relational terdistribusi dengan PostgreSQL dan caching Redis, mengurangi beban server puncak hingga 30%.",
-            "Mengotomatiskan pipeline CI/CD menggunakan GitHub Actions dan Docker, mempersingkat siklus deployment dari 40 menit menjadi 8 menit.",
-            "Berkolaborasi erat dengan tim produk dan UI/UX untuk menghasilkan antarmuka responsif dan aksesibel sesuai standar WCAG AA."
+            "Merancang arsitektur aplikasi full-stack menggunakan Next.js, Prisma, dan PostgreSQL, serta sukses melakukan migrasi dan kompilasi sistem web menjadi aplikasi mobile native (Android APK) memanfaatkan Capacitor.",
+            "Mengembangkan infrastruktur manajemen data terdistribusi yang mencakup 10 unit kategori medis rumah sakit, lengkap dengan fitur sinkronisasi kuis edukasi pasien secara real-time.",
+            "Menyusun logika automated rate-limiting (anti-spam cooldown) pada API route backend untuk mengoptimalkan performa beban database dan memastikan keamanan transmisi data rekam medis."
+          ]
+        },
+        {
+          "position": "System Analyst & Optimization",
+          "company": "Healthcare Workflow Management (B2B SaaS Prototype)",
+          "period": "2023 - 2025",
+          "location": "Sumedang",
+          "bulletPoints": [
+            "Melakukan audit alur kerja manual dan merancang ulang arsitektur sistem informasi rekam medis untuk menghilangkan hambatan input data.",
+            "Berhasil mengoptimalkan performa operasional dari 6 menit menjadi 2 menit per pasien melalui implementasi prototipe yang intuitif."
           ]
         }
       ],
       "projects": [
         {
-          "name": "Autonomous Auto-Apply Agent",
-          "technologies": "Next.js 16, TypeScript, Playwright, Groq LLM, Prisma, PostgreSQL",
-          "description": "Sistem digital talent acquisition otonom berbasis AI dengan anti-bot stealth evasion, dynamic JIT ATS-tailored resume generation, dan recruiter direct email outreach."
+          "name": "Whale Predator Tracker (Real-time Data Architecture)",
+          "technologies": "Next.js, TypeScript, Helius, Coinglass, Rugcheck API, Webhook-to-Telegram",
+          "description": "Merancang arsitektur sistem pemantauan data finansial terintegrasi yang menghubungkan berbagai API pihak ketiga (Helius, Coinglass, Rugcheck) ke dalam satu dasbor analitik dengan logika automated security filtering dan transmisi real-time Webhook ke Telegram."
         },
         {
-          "name": "High-Throughput Lead Enrichment Engine",
-          "technologies": "Node.js, TypeScript, Playwright, Better-SQLite3, Worker Threads",
-          "description": "Mesin crawling dan enrichment data B2B real-time dengan deduplikasi otomatis dan scoring kecocokan prospek berbasis LLM."
+          "name": "LumeStack (Premium SaaS Boilerplate)",
+          "technologies": "Next.js, Prisma, Clerk Auth, PostgreSQL, Gumroad",
+          "description": "Merancang dan mengembangkan premium full-stack SaaS boilerplate berbasis ekosistem Next.js dan Prisma yang dipasarkan secara komersial melalui platform Gumroad dengan sistem autentikasi Clerk."
+        },
+        {
+          "name": "KKF Label (Premium E-Commerce SaaS)",
+          "technologies": "Next.js 14, TypeScript, Prisma ORM, Supabase PostgreSQL, Midtrans QRIS, Capacitor",
+          "description": "Platform e-commerce mandiri end-to-end dengan gateway pembayaran instan Midtrans QRIS, sinkronisasi inventaris cloud, dan build APK Android."
         }
       ],
       "education": [
         {
-          "degree": "Sarjana Komputer (S.Kom) - Teknik Informatika",
-          "institution": "Universitas Komputer Indonesia",
-          "year": "2017 - 2021"
+          "degree": "Sarjana Komputer (S.Kom) - Teknik Informatika (IPK: 3.43)",
+          "institution": "Universitas Sebelas April",
+          "year": "2021 - 2025"
         }
       ],
       "certifications": [
-        "Meta Front-End Developer Professional Certificate",
-        "AWS Certified Solutions Architect - Associate (Preparation)"
+        "Applied Microsoft Office (2023)",
+        "JobReady Employability Skills - Wadhwani Foundation (2025)",
+        "Google Cloud Computing Foundations (2025)"
+      ],
+      "achievements": [
+        "Juara 1 Inovasi Teknologi Rumah Sakit tingkat Kabupaten (2026)",
+        "Meningkatkan Efisiensi Proses Input Data di Klinik dari 6 Menit menjadi 2 Menit (2025)",
+        "Meraih Skor Usability Excellent (81.2) pada Proyek Skripsi (2025)"
       ]
     },
     "partner": {
