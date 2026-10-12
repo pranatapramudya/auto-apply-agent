@@ -39,7 +39,7 @@
         {
           "position": "Full Stack Developer",
           "company": "KKF Label (Premium E-Commerce SaaS)",
-          "period": "2024 - Sekarang",
+          "period": "2026 - Sekarang",
           "location": "Sumedang / Remote",
           "bulletPoints": [
             "End-to-End Development: Merancang dan membangun platform e-commerce secara mandiri dari tahap konsep hingga tahap produksi menggunakan Next.js 14, TypeScript, dan Tailwind CSS.",
@@ -52,7 +52,7 @@
         {
           "position": "Architect & Developer",
           "company": "Enterprise Medical SaaS (White-Label Implementation)",
-          "period": "2024 - 2025",
+          "period": "2026",
           "location": "Sumedang / Hybrid",
           "bulletPoints": [
             "Merancang arsitektur aplikasi full-stack menggunakan Next.js, Prisma, dan PostgreSQL, serta sukses melakukan migrasi dan kompilasi sistem web menjadi aplikasi mobile native (Android APK) memanfaatkan Capacitor.",
@@ -61,29 +61,33 @@
           ]
         },
         {
-          "position": "System Analyst & Optimization",
-          "company": "Healthcare Workflow Management (B2B SaaS Prototype)",
+          "position": "UI/UX Designer & System Optimization (Magang Klinik)",
+          "company": "Healthcare Workflow Management (Magang Klinik)",
           "period": "2023 - 2025",
           "location": "Sumedang",
           "bulletPoints": [
-            "Melakukan audit alur kerja manual dan merancang ulang arsitektur sistem informasi rekam medis untuk menghilangkan hambatan input data.",
-            "Berhasil mengoptimalkan performa operasional dari 6 menit menjadi 2 menit per pasien melalui implementasi prototipe yang intuitif."
+            "Melakukan riset pengguna, perancangan antarmuka UI/UX, dan audit alur kerja manual rekam medis klinik untuk menghilangkan hambatan input data.",
+            "Berhasil mengoptimalkan performa operasional dari 6 menit menjadi 2 menit per pasien melalui implementasi prototipe yang intuitif.",
+            "Meraih Skor Usability Excellent (81.2) dan berkontribusi pada pencapaian Juara 1 Inovasi Teknologi Rumah Sakit tingkat Kabupaten."
           ]
         }
       ],
       "projects": [
         {
           "name": "Whale Predator Tracker (Real-time Data Architecture)",
+          "period": "2025",
           "technologies": "Next.js, TypeScript, Helius, Coinglass, Rugcheck API, Webhook-to-Telegram",
           "description": "Merancang arsitektur sistem pemantauan data finansial terintegrasi yang menghubungkan berbagai API pihak ketiga (Helius, Coinglass, Rugcheck) ke dalam satu dasbor analitik dengan logika automated security filtering dan transmisi real-time Webhook ke Telegram."
         },
         {
           "name": "LumeStack (Premium SaaS Boilerplate)",
+          "period": "2026",
           "technologies": "Next.js, Prisma, Clerk Auth, PostgreSQL, Gumroad",
           "description": "Merancang dan mengembangkan premium full-stack SaaS boilerplate berbasis ekosistem Next.js dan Prisma yang dipasarkan secara komersial melalui platform Gumroad dengan sistem autentikasi Clerk."
         },
         {
           "name": "KKF Label (Premium E-Commerce SaaS)",
+          "period": "2026",
           "technologies": "Next.js 14, TypeScript, Prisma ORM, Supabase PostgreSQL, Midtrans QRIS, Capacitor",
           "description": "Platform e-commerce mandiri end-to-end dengan gateway pembayaran instan Midtrans QRIS, sinkronisasi inventaris cloud, dan build APK Android."
         }
