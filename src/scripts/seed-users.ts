@@ -1,19 +1,17 @@
 import prisma from "../lib/prisma";
 import fs from "fs";
 import path from "path";
-
 import { config } from "../config/env";
 
 async function main() {
   console.log(
     "================================================================",
   );
-  console.log("🌱 MEMULAI SEEDING DATA USER MULTI-PROFIL KE NEON DB");
+  console.log("MEMULAI SEEDING DATA USER MULTI-PROFIL KE NEON DB");
   console.log(
     "================================================================\n",
   );
 
-  // Pastikan folder assets dan file resume placeholder tersedia
   const assetsDir = path.resolve(process.cwd(), "assets");
   if (!fs.existsSync(assetsDir)) {
     fs.mkdirSync(assetsDir, { recursive: true });
@@ -22,21 +20,7 @@ async function main() {
   const primaryResumePath = "./assets/resume-primary.pdf";
   const partnerResumePath = "./assets/resume-partner.pdf";
 
-  if (!fs.existsSync(path.resolve(process.cwd(), primaryResumePath))) {
-    fs.writeFileSync(
-      path.resolve(process.cwd(), primaryResumePath),
-      "%PDF-1.4\n%EOF",
-    );
-  }
-
-  if (!fs.existsSync(path.resolve(process.cwd(), partnerResumePath))) {
-    fs.writeFileSync(
-      path.resolve(process.cwd(), partnerResumePath),
-      "%PDF-1.4\n%EOF",
-    );
-  }
-
-  // 1. Profil Utama (Pranata Pramudya)
+  // 1. Profil Utama (Pranata Pramudya - AKTIF)
   const primaryUserData = {
     fullName: config.applicant.fullName,
     email: config.applicant.email,
@@ -46,36 +30,40 @@ async function main() {
     githubUrl: config.applicant.githubUrl,
     portfolioUrl: config.applicant.portfolioUrl,
     resumeLocalPath: primaryResumePath,
-    targetRoles: "Full-stack Developer, Next.js Developer, Backend Developer",
-    coreSkills: "Next.js, TypeScript, Prisma, PostgreSQL, Python",
-    expectedSalary: 20000000,
-    isActive: true,
+    targetRoles:
+      "Full-stack Developer, Next.js Developer, Backend Developer, Software Engineer",
+    coreSkills:
+      "Next.js, TypeScript, React, Prisma, PostgreSQL, Python, Node.js",
+    expectedSalary: 15000000,
+    isActive: true, // AKTIF UNTUK AUTO-APPLY
   };
 
-  // 2. Profil Pasangan (Placeholder yang mudah dikustomisasi)
+  // 2. Profil Pasangan (Siti Fathonah - NON-AKTIF SEPERTI PERMINTAAN USER)
   const partnerUserData = {
-    fullName: "Partner Profile (Placeholder)",
+    fullName: "Siti Fathonah",
     email: "partner.applicant@example.com",
     phone: "+6289876543210",
-    city: "Jakarta",
-    linkedInUrl: "https://linkedin.com/in/partner-placeholder",
-    githubUrl: "https://github.com/partner-placeholder",
+    city: "Sumedang / Bandung, Indonesia",
+    linkedInUrl: "https://linkedin.com/in/siti-fathonah",
+    githubUrl: "https://github.com/siti-fathonah",
     portfolioUrl: "https://partner.dev",
     resumeLocalPath: partnerResumePath,
-    targetRoles: "Frontend Developer, UI/UX Engineer, Web Developer",
-    coreSkills: "React, TypeScript, CSS, TailwindCSS, Next.js, Figma",
-    expectedSalary: 15000000,
-    isActive: true,
+    targetRoles:
+      "Staff Administrasi Publik, Policy Analyst, General Affairs, Document Controller",
+    coreSkills:
+      "Administrasi Perkantoran, Manajemen Dokumen, Microsoft Excel, Kearsipan Digital",
+    expectedSalary: 8500000,
+    isActive: false, // NON-AKTIF: JANGAN DIJALANKAN DULU
   };
 
-  console.log("Upserting Profil Utama...");
+  console.log("Upserting Profil Utama (Pranata Pramudya)...");
   const primaryUser = await prisma.user.upsert({
     where: { email: primaryUserData.email },
     update: primaryUserData,
     create: primaryUserData,
   });
 
-  console.log("Upserting Profil Pasangan...");
+  console.log("Upserting Profil Pasangan (Siti Fathonah - INACTIVE)...");
   const partnerUser = await prisma.user.upsert({
     where: { email: partnerUserData.email },
     update: partnerUserData,
@@ -85,27 +73,25 @@ async function main() {
   console.log(
     "\n----------------------------------------------------------------",
   );
-  console.log("✅ SEEDING BERHASIL! DETAIL PROFIL AKTIF:");
+  console.log("SEEDING SELESAI:");
   console.log(
     "----------------------------------------------------------------",
   );
-  console.log(`👤 User 1 (Profil Utama):`);
+  console.log(`User 1 (Pranata Pramudya):`);
   console.log(`   - ID         : ${primaryUser.id}`);
   console.log(`   - Nama       : ${primaryUser.fullName}`);
   console.log(`   - Email      : ${primaryUser.email}`);
-  console.log(`   - Roles      : ${primaryUser.targetRoles}`);
-  console.log(`   - Skills     : ${primaryUser.coreSkills}`);
-  console.log(`   - Resume     : ${primaryUser.resumeLocalPath}`);
-  console.log(`   - Aktif      : ${primaryUser.isActive}`);
+  console.log(
+    `   - Status     : ${primaryUser.isActive ? "AKTIF (SIAP RUNNING)" : "NON-AKTIF"}`,
+  );
   console.log("");
-  console.log(`👤 User 2 (Profil Pasangan):`);
+  console.log(`User 2 (Siti Fathonah):`);
   console.log(`   - ID         : ${partnerUser.id}`);
   console.log(`   - Nama       : ${partnerUser.fullName}`);
   console.log(`   - Email      : ${partnerUser.email}`);
-  console.log(`   - Roles      : ${partnerUser.targetRoles}`);
-  console.log(`   - Skills     : ${partnerUser.coreSkills}`);
-  console.log(`   - Resume     : ${partnerUser.resumeLocalPath}`);
-  console.log(`   - Aktif      : ${partnerUser.isActive}`);
+  console.log(
+    `   - Status     : ${partnerUser.isActive ? "AKTIF" : "NON-AKTIF (HOLD / DILEWATI)"}`,
+  );
   console.log(
     "----------------------------------------------------------------\n",
   );
@@ -113,7 +99,7 @@ async function main() {
 
 main()
   .catch((err) => {
-    console.error("❌ Terjadi error saat seeding users:", err);
+    console.error("Terjadi error saat seeding users:", err);
     process.exit(1);
   })
   .finally(async () => {
