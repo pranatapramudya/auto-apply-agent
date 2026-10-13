@@ -126,6 +126,7 @@ ${params.jobDescription ? params.jobDescription.slice(0, 1500) : "Tidak ada desk
           ],
           model,
           temperature: 0.4,
+          max_tokens: 1500,
           response_format: { type: "json_object" },
         });
 
