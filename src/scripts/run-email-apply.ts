@@ -162,10 +162,7 @@ export async function runEmailApply(options: RunEmailApplyOptions = {}) {
         if (isLive) {
           await prisma.jobListing.update({
             where: { id: job.id },
-            data: {
-              status: "APPLIED",
-              updatedAt: new Date(),
-            },
+            data: { status: "APPLIED", updatedAt: new Date() },
           });
           console.log(
             `🎉 [SUKSES TERKIRIM] Status di Database diperbarui ke: APPLIED`,
@@ -173,6 +170,20 @@ export async function runEmailApply(options: RunEmailApplyOptions = {}) {
         } else {
           console.log(
             `🛡️ [DRY-RUN] Simulasi berhasil. Status di DB dipertahankan.`,
+          );
+        }
+      } else {
+        if (result.error) {
+          await prisma.jobListing.update({
+            where: { id: job.id },
+            data: {
+              status: "FILTERED_OUT",
+              scamReason: result.error,
+              updatedAt: new Date(),
+            },
+          });
+          console.log(
+            `⚠️ [PENGIRIMAN DIBATALKAN/DNS INVALID] Ditandai FILTERED_OUT: ${result.error}`,
           );
         }
       }

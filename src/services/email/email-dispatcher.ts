@@ -1,3 +1,31 @@
+import dns from "dns";
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
+
+export async function validateEmailDomain(
+  email: string,
+): Promise<{ valid: boolean; reason?: string }> {
+  const parts = email.split("@");
+  if (parts.length !== 2 || !parts[1].includes(".")) {
+    return { valid: false, reason: "Format email tidak valid" };
+  }
+  const domain = parts[1].toLowerCase().trim();
+  try {
+    const mx = await dns.promises.resolveMx(domain);
+    if (!mx || mx.length === 0) {
+      return {
+        valid: false,
+        reason: `Domain ${domain} tidak memiliki mail server (MX kosong)`,
+      };
+    }
+    return { valid: true };
+  } catch (err: any) {
+    return {
+      valid: false,
+      reason: `Domain ${domain} tidak terdaftar di DNS (${err.code || err.message})`,
+    };
+  }
+}
+
 import { config } from "../../config/env";
 import nodemailer from "nodemailer";
 import fs from "fs";
@@ -79,6 +107,22 @@ export async function dispatchApplicationEmail(
       subject: params.subject,
       sentAt,
       messageId: `simulated-${Date.now()}`,
+    };
+  }
+
+  // Validasi DNS MX Domain Penerima (Mencegah Mailer-Daemon Bounce)
+  const domainCheck = await validateEmailDomain(params.toEmail);
+  if (!domainCheck.valid) {
+    console.warn(
+      `[EMAIL-DISPATCHER] 🛑 PENGIRIMAN DIBATALKAN: ${domainCheck.reason}`,
+    );
+    return {
+      success: false,
+      mode: isDryRun ? "DRY_RUN" : "LIVE_SEND",
+      to: params.toEmail,
+      subject: params.subject,
+      sentAt,
+      error: domainCheck.reason,
     };
   }
 
