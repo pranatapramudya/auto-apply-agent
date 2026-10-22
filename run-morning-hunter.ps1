@@ -1,4 +1,4 @@
-# run-morning-hunter.ps1
+﻿# run-morning-hunter.ps1
 # Runner Otomatis Lowongan Kerja Pagi Hari (Khusus Pranata Pramudya)
 
 $ErrorActionPreference = "Continue"
@@ -39,6 +39,10 @@ npx tsx src/scripts/run-email-apply.ts --user=41dbb7bd-8638-4fa7-80d7-dc968c6ad2
 # 6. Action Engine Web Portal (Dry-Run / Safe Queue)
 "[$dateStr] Step 6: Evaluasi antrean portal web..." | Out-File -FilePath $logFile -Append -Encoding utf8
 npx tsx src/scripts/run-apply.ts --user=41dbb7bd-8638-4fa7-80d7-dc968c6ad278 --limit=5 2>&1 | Out-File -FilePath $logFile -Append -Encoding utf8
+
+# 7. Kirim Ringkasan Laporan ke Telegram Pribadi Pranata
+"[$dateStr] Step 7: Mengirimkan rekap laporan hasil pelamaran ke Telegram..." | Out-File -FilePath $logFile -Append -Encoding utf8
+npx tsx src/scripts/send-hunter-report.ts 2>&1 | Out-File -FilePath $logFile -Append -Encoding utf8
 
 $finishStr = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 "[$finishStr] Selesai siklus pagi hari Auto-Apply Agent." | Out-File -FilePath $logFile -Append -Encoding utf8
