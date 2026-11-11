@@ -34,7 +34,7 @@ async function main() {
       githubUrl: "https://github.com/pranatapramudya",
       portfolioUrl: "https://portofolio-pranata-pramudya.vercel.app",
       targetRoles:
-        "Systems Architect & Process Optimization Specialist, Full Stack Developer, Next.js Developer, Backend Developer, Software Engineer",
+        "Full Stack Developer, Next.js Developer, Frontend Developer, Backend Developer, Software Engineer, Web Developer, Systems Architect & Process Optimization Specialist",
       coreSkills:
         "Next.js 14, TypeScript, React, Prisma ORM, PostgreSQL, Supabase, Capacitor, Midtrans API, Clerk Auth, Tailwind CSS, Google Cloud Foundations, Applied Microsoft Office",
       isActive: true,

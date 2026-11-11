@@ -147,7 +147,7 @@ async function main() {
       where: {
         userId: user.id,
         status: "DISCOVERED",
-        matchScore: { gte: 0.7 },
+        matchScore: { gte: 0.6 },
       },
       orderBy: { matchScore: "desc" },
       take: remainingQuota,
